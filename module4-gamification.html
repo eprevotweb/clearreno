@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClearRéno — Gamification & Score Carbone</title>
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&f[]=satoshi@400,600,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#1A3C2E;--secondary:#2D6A4F;--accent:#52B788;--bg:#F0FAF4;--surface:#FAFAFA;--dark:#0F1F17;--text:#1A1A1A;--muted:#666666;--success:#D8F3DC;--error:#FFDDD2;--font-d:'Clash Display',sans-serif;--font-b:'Satoshi',sans-serif;--font-m:'JetBrains Mono',monospace;--shadow:0 2px 8px rgba(0,0,0,.06);--shadow-lg:0 8px 24px rgba(0,0,0,.12)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-b);color:var(--text);background:var(--bg);overflow-x:hidden}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;background:var(--primary);height:72px;display:flex;align-items:center}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;width:100%;display:flex;align-items:center;gap:24px}
+.nav-logo{font-family:var(--font-d);font-weight:700;font-size:22px;color:#fff}
+.nav-menu{display:flex;list-style:none;gap:0;flex:1}
+.nav-menu a{font-size:14px;font-weight:600;color:rgba(255,255,255,.6);text-decoration:none;padding:10px 16px;border-radius:6px;cursor:pointer;transition:all .2s}
+.nav-menu li.active a{color:#fff;background:rgba(255,255,255,.1)}
+.nav-avatar{width:36px;height:36px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:13px;margin-left:auto}
+
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:8px;font-family:var(--font-b);font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all .2s;white-space:nowrap}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(82,183,136,.4)}
+.btn-secondary{background:transparent;color:var(--accent);border:2px solid var(--accent)}.btn-secondary:hover{transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--secondary)}.btn-ghost:hover{text-decoration:underline}
+.btn-sm{padding:7px 14px;font-size:12px}
+.btn-full{width:100%;justify-content:center}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+
+.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:100px;font-size:12px;font-weight:600}
+.badge-success{background:var(--success);color:var(--primary)}
+.badge-level{background:linear-gradient(135deg,var(--accent),var(--secondary));color:#fff;padding:6px 14px;font-size:13px}
+
+.container{max-width:1200px;margin:0 auto;padding:0 24px}
+.section{padding:64px 0}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.card{background:var(--surface);border-radius:12px;box-shadow:var(--shadow);padding:24px;border:1px solid rgba(0,0,0,.04)}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#0F1F17,#1A3C2E,#2D6A4F);padding:100px 0 64px;text-align:center;color:#fff}
+.hero-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(82,183,136,.2);color:var(--accent);padding:8px 16px;border-radius:100px;font-size:13px;font-weight:700;margin-bottom:24px;border:1px solid rgba(82,183,136,.3)}
+.hero-title{font-family:var(--font-d);font-weight:700;font-size:clamp(32px,4vw,52px);margin-bottom:12px}
+.hero-sub{color:rgba(255,255,255,.7);font-size:17px;margin-bottom:32px}
+.hero-counter{font-family:var(--font-m);font-size:80px;font-weight:700;color:#fff;line-height:1;display:block;margin-bottom:8px}
+.hero-counter-label{font-size:16px;color:rgba(255,255,255,.65)}
+.equivs{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:32px}
+.equiv{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:14px 20px;text-align:center;backdrop-filter:blur(4px)}
+.equiv-icon{font-size:28px;display:block;margin-bottom:6px}
+.equiv-text{font-size:13px;color:rgba(255,255,255,.9)}
+
+/* GAUGE */
+.gauge-wrap{display:flex;justify-content:center;position:relative;margin:12px auto}
+.gauge-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.gauge-big-val{font-family:var(--font-d);font-weight:700;font-size:48px;color:var(--primary);line-height:1}
+.gauge-big-label{font-size:14px;color:var(--muted);margin-top:4px}
+.gauge-big-sub{font-size:12px;color:var(--muted);margin-top:2px}
+
+/* COMPARE */
+.compare-row{margin-bottom:16px}
+.compare-label{display:flex;justify-content:space-between;margin-bottom:6px;font-size:14px}
+.compare-bar{height:12px;background:#EEE;border-radius:100px;overflow:hidden}
+.compare-fill{height:100%;border-radius:100px;transition:width 1.5s ease-out;width:0}
+.top-badge{background:var(--success);border-radius:10px;padding:14px 20px;margin-top:16px;display:flex;align-items:center;gap:10px}
+
+/* PROGRESS */
+.progress-wrap{background:#EEE;border-radius:100px;height:10px;margin:10px 0;overflow:hidden}
+.progress-fill{height:100%;background:var(--accent);border-radius:100px;transition:width 1.2s ease-out}
+
+/* LEVEL CARD */
+.level-hero{background:linear-gradient(135deg,var(--primary),var(--accent));border-radius:16px;padding:32px;color:#fff;margin-bottom:24px}
+.level-pts{font-family:var(--font-m);font-size:64px;font-weight:700;color:#fff;line-height:1;display:block}
+.level-name{font-family:var(--font-d);font-weight:700;font-size:22px;margin-top:8px}
+.level-perks{list-style:none;margin-top:16px;display:flex;flex-direction:column;gap:6px}
+.level-perks li{font-size:14px;color:rgba(255,255,255,.85)}
+
+.levels-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:32px}
+.level-mini{background:#fff;border-radius:10px;padding:14px;box-shadow:var(--shadow);border:2px solid #EEE;text-align:center}
+.level-mini.current{border-color:var(--accent);background:var(--bg)}
+.level-mini.done{opacity:.6}
+.level-mini-icon{font-size:28px;margin-bottom:6px;display:block}
+.level-mini-name{font-family:var(--font-d);font-weight:700;font-size:13px;margin-bottom:2px}
+.level-mini-pts{font-size:11px;color:var(--muted)}
+
+/* HISTORY */
+.history-tabs{display:flex;gap:0;border-bottom:2px solid rgba(0,0,0,.06);margin-bottom:20px}
+.htab{padding:10px 16px;font-size:13px;font-weight:700;color:var(--muted);border:none;background:transparent;border-bottom:2px solid transparent;margin-bottom:-2px;cursor:pointer;transition:all .2s}
+.htab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.hist-item{display:flex;justify-content:space-between;align-items:center;padding:14px;border-radius:8px;margin-bottom:8px;transition:background .2s;cursor:default}
+.hist-item:hover.gain{background:rgba(82,183,136,.06)}
+.hist-item:hover.depense{background:rgba(230,57,70,.06)}
+.hist-item.gain{}
+.hist-item.depense{}
+.hist-icon{font-size:20px;flex-shrink:0}
+.hist-info{flex:1;padding:0 14px}
+.hist-action{font-weight:700;font-size:14px}
+.hist-date{font-size:12px;color:var(--muted)}
+.hist-pts{font-family:var(--font-m);font-weight:700;font-size:15px}
+.pts-pos{color:var(--secondary)}
+.pts-neg{color:#E63946}
+
+/* BADGES GRID */
+.badges-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.badge-card{background:#fff;border-radius:12px;padding:20px;text-align:center;border:2px solid #EEE;box-shadow:var(--shadow);transition:all .2s;position:relative}
+.badge-card.unlocked{border-color:var(--accent);background:var(--bg)}
+.badge-card.locked{opacity:.45;filter:grayscale(.8)}
+.badge-card:hover.locked{transform:translateY(-2px)}
+.badge-icon-big{font-size:40px;display:block;margin-bottom:8px}
+.badge-name-big{font-family:var(--font-d);font-weight:700;font-size:14px;margin-bottom:4px}
+.badge-desc{font-size:12px;color:var(--muted)}
+.badge-prog{margin-top:8px;font-size:11px;color:var(--secondary);font-weight:700}
+.badge-unlock-check{position:absolute;top:-6px;right:-6px;width:22px;height:22px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700}
+.tooltip{position:relative}
+.tooltip:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:rgba(0,0,0,.8);color:#fff;padding:6px 10px;border-radius:6px;font-size:11px;white-space:nowrap;z-index:10;pointer-events:none}
+
+/* REWARDS TABS */
+.reward-tabs{display:flex;gap:0;border-bottom:2px solid rgba(0,0,0,.06);margin-bottom:24px}
+.rtab{padding:12px 20px;font-size:14px;font-weight:700;color:var(--muted);border:none;background:transparent;border-bottom:2px solid transparent;margin-bottom:-2px;cursor:pointer;transition:all .2s}
+.rtab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.rtab-panel{display:none}
+.rtab-panel.active{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.reward-card{background:#fff;border-radius:12px;padding:20px;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,.04);text-align:center}
+.reward-icon-big{font-size:40px;margin-bottom:12px;display:block}
+.reward-title{font-family:var(--font-d);font-weight:700;font-size:16px;margin-bottom:4px}
+.reward-desc{font-size:13px;color:var(--muted);margin-bottom:6px}
+.reward-pts{font-family:var(--font-m);font-size:14px;font-weight:700;color:var(--secondary);margin-bottom:14px}
+.pts-remaining{font-size:12px;color:var(--muted)}
+
+/* AI CARD */
+.ai-card{background:var(--primary);border-radius:16px;padding:32px;color:#fff;margin-bottom:32px}
+.ai-result-items{margin-top:20px;display:flex;flex-direction:column;gap:14px}
+.ai-result-item{display:flex;gap:12px}
+.ai-result-icon{font-size:22px;flex-shrink:0}
+.ai-result-text{font-size:14px;line-height:1.6;color:rgba(255,255,255,.9)}
+.ai-result-label{font-family:var(--font-d);font-weight:700;font-size:12px;color:var(--accent);margin-bottom:2px}
+
+/* SHARE */
+.share-card{background:linear-gradient(135deg,var(--primary),var(--secondary));border-radius:16px;padding:32px;text-align:center;color:#fff;max-width:480px;margin:0 auto}
+.share-post-box{background:rgba(255,255,255,.1);border-radius:12px;padding:16px;margin:16px 0;text-align:left;font-size:14px;color:rgba(255,255,255,.9);line-height:1.6;min-height:100px;border:1px solid rgba(255,255,255,.2);cursor:text}
+.share-post-box[contenteditable]:focus{outline:2px solid var(--accent)}
+.net-btns{display:flex;gap:4px;margin-bottom:16px;background:rgba(255,255,255,.1);border-radius:8px;padding:4px}
+.net-btn{flex:1;padding:8px;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:700;transition:all .2s;background:transparent;color:rgba(255,255,255,.7)}
+.net-btn.active{background:rgba(255,255,255,.2);color:#fff}
+.share-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.share-btn{padding:10px 20px;border-radius:100px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:transform .2s,opacity .2s}
+.share-btn:hover{transform:translateY(-2px);opacity:.9}
+.share-linkedin{background:#0A66C2;color:#fff}
+.share-whatsapp{background:#25D366;color:#fff}
+.share-copy{background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.3)}
+
+/* SKELETON */
+.skeleton{background:linear-gradient(90deg,rgba(255,255,255,.1) 25%,rgba(255,255,255,.2) 50%,rgba(255,255,255,.1) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px}
+@keyframes shimmer{from{background-position:200% 0}to{background-position:-200% 0}}
+.skeleton-dark{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.5);align-items:center;justify-content:center;padding:24px}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:16px;box-shadow:var(--shadow-lg);max-width:420px;width:100%;padding:28px;text-align:center}
+
+/* FADE */
+.fade-up{opacity:0;transform:translateY(24px);transition:all .6s ease-out}
+.fade-up.visible{opacity:1;transform:translateY(0)}
+
+/* RESPONSIVE */
+@media(max-width:1024px){.grid-2{grid-template-columns:1fr}.badges-grid{grid-template-columns:repeat(3,1fr)}.levels-row{grid-template-columns:repeat(2,1fr)}.rtab-panel.active{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:768px){.grid-3,.grid-4{grid-template-columns:repeat(2,1fr)}.badges-grid{grid-template-columns:repeat(2,1fr)}.rtab-panel.active{grid-template-columns:1fr}.nav-menu{display:none}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo">ClearRéno</div>
+    <ul class="nav-menu">
+      <li><a>Dashboard</a></li>
+      <li><a>Mon chantier</a></li>
+      <li><a>Messagerie</a></li>
+      <li class="active"><a>Impact carbone</a></li>
+    </ul>
+    <div class="nav-avatar">TR</div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero" style="padding-top:132px">
+  <div class="container">
+    <div class="hero-pill">🌿 Éco-Acteur — Niveau 2/4</div>
+    <h1 class="hero-title">Votre impact écologique, Thomas</h1>
+    <p class="hero-sub">Depuis vos travaux du 2 mai 2026 — PAC air/eau Daikin 11kW</p>
+    <span class="hero-counter" id="co2Counter">0</span>
+    <span class="hero-counter-label">tonnes de CO₂ économisées</span>
+    <div class="equivs">
+      <div class="equiv"><span class="equiv-icon">✈️</span><span class="equiv-text">8 vols Paris–Nice évités</span></div>
+      <div class="equiv"><span class="equiv-icon">🚗</span><span class="equiv-text">12 000 km non parcourus</span></div>
+      <div class="equiv"><span class="equiv-icon">🌳</span><span class="equiv-text">48 arbres nécessaires</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION JAUGES + GRAPHIQUE -->
+<div class="section" style="background:#fff">
+  <div class="container">
+    <div class="grid-2">
+      <!-- Jauge -->
+      <div>
+        <h2 style="font-family:var(--font-d);font-weight:600;font-size:24px;color:var(--primary);margin-bottom:24px">📊 Votre bilan carbone</h2>
+        <div class="gauge-wrap" style="width:280px;height:280px">
+          <svg width="280" height="280" viewBox="0 0 280 280">
+            <circle cx="140" cy="140" r="110" fill="none" stroke="#EEE" stroke-width="20"/>
+            <circle cx="140" cy="140" r="110" fill="none" stroke="var(--accent)" stroke-width="20"
+              stroke-dasharray="691.15" stroke-dashoffset="691.15" stroke-linecap="round"
+              transform="rotate(-90 140 140)" id="bigGauge" style="transition:stroke-dashoffset 2s ease-out"/>
+          </svg>
+          <div class="gauge-center">
+            <div class="gauge-big-val">2,4 t</div>
+            <div class="gauge-big-label">CO₂ économisées</div>
+            <div class="gauge-big-sub">sur 3,8 t/an objectif</div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:24px">
+          <h3 style="font-family:var(--font-d);font-weight:600;font-size:16px;margin-bottom:16px">Vous vs la moyenne clients</h3>
+          <div class="compare-row">
+            <div class="compare-label"><span style="font-weight:700">Thomas Renard</span><span style="font-family:var(--font-m);font-weight:700;color:var(--accent)">2,4 t/an</span></div>
+            <div class="compare-bar"><div class="compare-fill" data-pct="80" style="background:var(--accent)"></div></div>
+          </div>
+          <div class="compare-row">
+            <div class="compare-label"><span>Moyenne clients EcoTech</span><span style="font-family:var(--font-m)">0,9 t/an</span></div>
+            <div class="compare-bar"><div class="compare-fill" data-pct="30" style="background:var(--muted)"></div></div>
+          </div>
+          <div class="top-badge"><span style="font-size:20px">🏆</span><p style="font-size:13px;font-weight:700;color:var(--primary)">Vous économisez 2,7× plus que la moyenne EcoTech — Top 15% des clients !</p></div>
+        </div>
+      </div>
+
+      <!-- Graphique mensuel -->
+      <div>
+        <h2 style="font-family:var(--font-d);font-weight:600;font-size:24px;color:var(--primary);margin-bottom:24px">📈 Évolution mensuelle CO₂</h2>
+        <div class="card">
+          <p style="font-size:13px;color:var(--muted);margin-bottom:20px">Depuis vos travaux — économies CO₂ par mois</p>
+          <svg id="carbonChart" width="100%" height="220" viewBox="0 0 520 220" preserveAspectRatio="xMidYMid meet"></svg>
+          <p style="text-align:center;margin-top:16px;font-family:var(--font-m);font-size:15px;font-weight:700;color:var(--primary)">Projection annuelle : 2,4 t CO₂</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI IMPACT -->
+    <div class="ai-card fade-up" style="margin-top:48px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+        <span style="background:var(--accent);color:#fff;padding:4px 12px;border-radius:100px;font-size:11px;font-weight:700">✨ Analyse IA</span>
+        <h3 style="font-family:var(--font-d);font-weight:700;font-size:20px;color:#fff">Ce que signifient vos 2,4 tonnes</h3>
+      </div>
+      <p style="font-size:14px;color:rgba(255,255,255,.7);margin-bottom:20px">Personnalisée pour votre profil et vos travaux</p>
+      <button class="btn btn-secondary" style="border-color:var(--accent);color:var(--accent);background:rgba(82,183,136,.1)" onclick="loadAIImpact(this)">🤖 Générer mon analyse personnalisée</button>
+      <div class="ai-result-items" id="aiImpactResult" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PROGRAMME DE POINTS -->
+<div class="section">
+  <div class="container">
+    <h2 style="font-family:var(--font-d);font-weight:700;font-size:32px;color:var(--primary);margin-bottom:32px">⭐ Mon programme de fidélité</h2>
+
+    <div class="grid-2" style="gap:24px">
+      <!-- Niveau actuel -->
+      <div>
+        <div class="level-hero">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div>
+              <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Niveau actuel</div>
+              <div class="level-name">ÉCO-ACTEUR</div>
+              <span class="level-pts">851 pts</span>
+            </div>
+            <span style="font-size:40px">🌱</span>
+          </div>
+          <div style="margin-top:20px">
+            <div style="display:flex;justify-content:space-between;font-size:13px;color:rgba(255,255,255,.7);margin-bottom:6px"><span>851 pts</span><span>Champion Vert 1 500 pts</span></div>
+            <div style="background:rgba(255,255,255,.2);border-radius:100px;height:8px;overflow:hidden"><div style="width:56%;height:100%;background:#fff;border-radius:100px;transition:width 1s ease-out" id="levelProg"></div></div>
+            <div style="font-size:13px;color:rgba(255,255,255,.65);margin-top:8px">649 points pour atteindre Champion Vert</div>
+          </div>
+          <ul class="level-perks">
+            <li>✓ Réduction 10% sur prochain entretien</li>
+            <li>✓ Accès à la hotline prioritaire</li>
+            <li>✓ Newsletter exclusive économies d'énergie</li>
+          </ul>
+        </div>
+
+        <!-- Historique -->
+        <div class="card">
+          <h3 style="font-family:var(--font-d);font-weight:600;font-size:18px;color:var(--primary);margin-bottom:16px">Historique des points</h3>
+          <div class="history-tabs">
+            <button class="htab active" onclick="showHistTab(this,'all')">Tous</button>
+            <button class="htab" onclick="showHistTab(this,'gain')">Gains</button>
+            <button class="htab" onclick="showHistTab(this,'depense')">Dépenses</button>
+          </div>
+          <div id="histList"></div>
+          <div style="border-top:1px solid rgba(0,0,0,.06);padding-top:14px;margin-top:8px;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:14px;color:var(--muted)">Solde actuel</span>
+            <span style="font-family:var(--font-m);font-size:18px;font-weight:700;color:var(--primary)">851 pts</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Niveaux -->
+      <div>
+        <h3 style="font-family:var(--font-d);font-weight:600;font-size:18px;color:var(--primary);margin-bottom:16px">Les 4 niveaux</h3>
+        <div class="levels-row">
+          <div class="level-mini done"><span class="level-mini-icon">🌱</span><div class="level-mini-name">Débutant Éco</div><div class="level-mini-pts">0 – 500 pts</div><div style="margin-top:8px"><span class="badge badge-success" style="font-size:10px">✓ Atteint</span></div></div>
+          <div class="level-mini current"><span class="level-mini-icon">🌿</span><div class="level-mini-name">Éco-Acteur</div><div class="level-mini-pts">501 – 1 500 pts</div><div style="margin-top:8px"><span class="badge badge-level" style="font-size:10px">● Actuel</span></div></div>
+          <div class="level-mini" style="opacity:.6"><span class="level-mini-icon">🏆</span><div class="level-mini-name">Champion Vert</div><div class="level-mini-pts">1 501 – 3 000 pts</div><div style="margin-top:8px;font-size:11px;color:var(--muted)">🔒 À débloquer</div></div>
+          <div class="level-mini" style="opacity:.5"><span class="level-mini-icon">🌍</span><div class="level-mini-name">Ambassadeur</div><div class="level-mini-pts">3 001 + pts</div><div style="margin-top:8px;font-size:11px;color:var(--muted)">🔒 À débloquer</div></div>
+        </div>
+
+        <!-- Badges -->
+        <h3 style="font-family:var(--font-d);font-weight:600;font-size:18px;color:var(--primary);margin:24px 0 16px">🏅 Mes accomplissements</h3>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px">3 badges obtenus sur 8 disponibles</p>
+        <div class="badges-grid" style="grid-template-columns:repeat(4,1fr)">
+          <div class="badge-card unlocked tooltip" data-tip="Débloqué !"><div class="badge-unlock-check">✓</div><span class="badge-icon-big">🏠</span><div class="badge-name-big">Premier chantier</div><div class="badge-desc">Votre aventure a commencé !</div></div>
+          <div class="badge-card unlocked tooltip" data-tip="Débloqué !"><div class="badge-unlock-check">✓</div><span class="badge-icon-big">🧮</span><div class="badge-name-big">Simulation complète</div><div class="badge-desc">Vous savez ce que vous économisez</div></div>
+          <div class="badge-card unlocked tooltip" data-tip="Débloqué !"><div class="badge-unlock-check">✓</div><span class="badge-icon-big">📱</span><div class="badge-name-big">Partageur éco</div><div class="badge-desc">Inspirez votre entourage</div></div>
+          <div class="badge-card locked tooltip" data-tip="Valider 3 étapes de maintenance"><span class="badge-icon-big">🔥</span><div class="badge-name-big">Expert PAC</div><div class="badge-desc">Maintenance maîtrisée</div></div>
+          <div class="badge-card locked tooltip" data-tip="Parrainer 1 proche"><span class="badge-icon-big">👥</span><div class="badge-name-big">Parrain Éco</div><div class="badge-desc">0/1 parrainage</div><div class="badge-prog">0 / 1</div></div>
+          <div class="badge-card locked tooltip" data-tip="Atteindre 1 500 points"><span class="badge-icon-big">🏆</span><div class="badge-name-big">Champion Vert</div><div class="badge-desc">851 / 1 500 pts</div><div class="badge-prog">851 / 1 500 pts</div></div>
+          <div class="badge-card locked tooltip" data-tip="Atteindre 3 000 points"><span class="badge-icon-big">🌍</span><div class="badge-name-big">Ambassadeur</div><div class="badge-desc">851 / 3 000 pts</div><div class="badge-prog">851 / 3 000 pts</div></div>
+          <div class="badge-card locked tooltip" data-tip="Dépasser le seuil de rentabilité"><span class="badge-icon-big">⚡</span><div class="badge-name-big">ROI 5 ans</div><div class="badge-desc">Progression : 3 / 5 ans</div><div class="badge-prog">3 / 5 ans</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RÉCOMPENSES -->
+<div class="section" style="background:#fff">
+  <div class="container">
+    <h2 style="font-family:var(--font-d);font-weight:700;font-size:32px;color:var(--primary);margin-bottom:8px">🎁 Utiliser mes points</h2>
+    <p style="font-size:15px;color:var(--muted);margin-bottom:32px">851 points disponibles</p>
+    <div class="reward-tabs">
+      <button class="rtab active" onclick="showRTab(this,'ecotech')">Remises EcoTech</button>
+      <button class="rtab" onclick="showRTab(this,'partenaires')">Partenaires</button>
+      <button class="rtab" onclick="showRTab(this,'dons')">Dons écologiques</button>
+    </div>
+    <div class="rtab-panel active" id="rtab-ecotech">
+      <div class="reward-card"><span class="reward-icon-big">💰</span><div class="reward-title">−50€ sur prochain chantier</div><div class="reward-desc">Remise directe sur devis</div><div class="reward-pts">1 000 pts requis</div><div class="pts-remaining">Il vous manque 149 pts</div><div style="margin-top:12px"><button class="btn btn-sm btn-full" disabled style="background:#EEE;color:#999;border:none;cursor:not-allowed">Bientôt disponible</button></div></div>
+      <div class="reward-card"><span class="reward-icon-big">🔧</span><div class="reward-title">Entretien PAC offert</div><div class="reward-desc">Valeur : 89 € HT</div><div class="reward-pts">500 pts requis</div><div style="color:var(--secondary);font-size:12px;font-weight:700;margin-bottom:12px">✓ Disponible maintenant !</div><button class="btn btn-primary btn-sm btn-full" onclick="usePoints(this,500,'Entretien PAC offert')">Utiliser 500 pts</button></div>
+      <div class="reward-card"><span class="reward-icon-big">🌡️</span><div class="reward-title">Diagnostic thermique gratuit</div><div class="reward-desc">Audit énergétique de 2h</div><div class="reward-pts">300 pts requis</div><div style="color:var(--secondary);font-size:12px;font-weight:700;margin-bottom:12px">✓ Disponible maintenant !</div><button class="btn btn-primary btn-sm btn-full" onclick="usePoints(this,300,'Diagnostic thermique')">Utiliser 300 pts</button></div>
+    </div>
+    <div class="rtab-panel" id="rtab-partenaires">
+      <div class="reward-card"><span class="reward-icon-big">🟢</span><div class="reward-title">Leroy Merlin</div><div class="reward-desc">Bon d'achat 25€</div><div class="reward-pts">500 pts</div><button class="btn btn-primary btn-sm btn-full" style="margin-top:12px" onclick="usePoints(this,500,'Bon Leroy Merlin')">Utiliser 500 pts</button></div>
+      <div class="reward-card"><span class="reward-icon-big">⚡</span><div class="reward-title">Darty Éco</div><div class="reward-desc">−15% sur appareils A+++</div><div class="reward-pts">400 pts</div><button class="btn btn-primary btn-sm btn-full" style="margin-top:12px" onclick="usePoints(this,400,'Remise Darty')">Utiliser 400 pts</button></div>
+      <div class="reward-card"><span class="reward-icon-big">📦</span><div class="reward-title">Amazon Éco-sélection</div><div class="reward-desc">Bon d'achat 20€</div><div class="reward-pts">400 pts</div><button class="btn btn-primary btn-sm btn-full" style="margin-top:12px" onclick="usePoints(this,400,'Bon Amazon')">Utiliser 400 pts</button></div>
+    </div>
+    <div class="rtab-panel" id="rtab-dons">
+      <div class="reward-card"><span class="reward-icon-big">🐼</span><div class="reward-title">WWF France</div><div class="reward-desc">Protéger 1 ha de forêt</div><div class="reward-pts">200 pts</div><button class="btn btn-primary btn-sm btn-full" style="margin-top:12px" onclick="usePoints(this,200,'Don WWF')">Donner 200 pts</button></div>
+      <div class="reward-card"><span class="reward-icon-big">🌳</span><div class="reward-title">Fondation GoodPlanet</div><div class="reward-desc">Planter 5 arbres</div><div class="reward-pts">100 pts</div><button class="btn btn-primary btn-sm btn-full" style="margin-top:12px" onclick="usePoints(this,100,'Don GoodPlanet')">Donner 100 pts</button></div>
+      <div class="reward-card"><span class="reward-icon-big">🌊</span><div class="reward-title">Surfrider Foundation</div><div class="reward-desc">Nettoyer 10m de plage</div><div class="reward-pts">150 pts</div><button class="btn btn-primary btn-sm btn-full" style="margin-top:12px" onclick="usePoints(this,150,'Don Surfrider')">Donner 150 pts</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- PARTAGE -->
+<div class="section">
+  <div class="container">
+    <h2 style="font-family:var(--font-d);font-weight:700;font-size:32px;color:var(--primary);text-align:center;margin-bottom:48px">📣 Partagez votre impact</h2>
+    <div class="share-card">
+      <h3 style="font-family:var(--font-d);font-weight:700;font-size:20px;margin-bottom:8px">Générez votre publication</h3>
+      <p style="font-size:14px;color:rgba(255,255,255,.7);margin-bottom:16px">L'IA rédige un post adapté à chaque réseau</p>
+      <div class="net-btns">
+        <button class="net-btn active" onclick="selectNet(this,'linkedin')">LinkedIn</button>
+        <button class="net-btn" onclick="selectNet(this,'twitter')">Twitter/X</button>
+        <button class="net-btn" onclick="selectNet(this,'whatsapp')">WhatsApp</button>
+      </div>
+      <button class="btn btn-primary btn-sm btn-full" onclick="genPost()" style="margin-bottom:12px">✨ Générer mon post</button>
+      <div class="share-post-box" id="sharePostBox" contenteditable="true">Cliquez sur « Générer » pour créer votre publication personnalisée.</div>
+      <div class="share-btns">
+        <button class="share-btn share-linkedin" onclick="alert('Ouverture LinkedIn…')">🔗 LinkedIn</button>
+        <button class="share-btn share-whatsapp" onclick="alert('Ouverture WhatsApp…')">💬 WhatsApp</button>
+        <button class="share-btn share-copy" onclick="copyPost()">📋 Copier</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL POINTS -->
+<div class="modal-overlay" id="pointsModal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div style="font-size:48px;margin-bottom:16px">🎉</div>
+    <h3 style="font-family:var(--font-d);font-weight:700;font-size:22px;color:var(--primary);margin-bottom:8px" id="modalTitle">Récompense activée !</div>
+    <p style="color:var(--muted);font-size:14px;margin-bottom:8px" id="modalDesc"></p>
+    <p style="font-family:var(--font-m);font-size:16px;font-weight:700;color:var(--secondary);margin-bottom:24px" id="modalPts"></p>
+    <button class="btn btn-primary btn-full" onclick="closeModal()">Parfait !</button>
+  </div>
+</div>
+
+<script>
+const HIST = [
+  {date:"10 mai 2026",action:"Étape 4 en cours",pts:+100,type:"gain"},
+  {date:"9 mai 2026",action:"Score partagé sur LinkedIn",pts:+30,type:"gain"},
+  {date:"8 mai 2026",action:"Étape 3 validée",pts:+100,type:"gain"},
+  {date:"10 mai 2026",action:"Réduction chantier utilisée",pts:-130,type:"depense"},
+  {date:"2 mai 2026",action:"Chantier terminé",pts:+500,type:"gain"},
+  {date:"28 avr. 2026",action:"Devis signé",pts:+200,type:"gain"},
+  {date:"15 avr. 2026",action:"Simulation complète",pts:+50,type:"gain"}
+];
+
+let userPoints = 851;
+let selectedNet = 'linkedin';
+
+// COUNT UP
+function countUp(el,target,duration=2000,suffix=''){
+  const start=performance.now();
+  function step(now){
+    const p=Math.min((now-start)/duration,1);
+    const e=1-Math.pow(1-p,3);
+    const v=e*target;
+    el.textContent=v.toFixed(1)+suffix;
+    if(p<1)requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+// CARBON CHART
+function drawCarbonChart(){
+  const svg=document.getElementById('carbonChart');
+  if(!svg)return;
+  const months=['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+  const vals=[0.18,0.21,0.19,0.20,0.22,0.21,0.20,0.19,0.21,0.18,0.20,0.21];
+  const current=4;
+  const W=520,H=200,padL=36,padB=32,padT=16;
+  const maxVal=Math.max(...vals)*1.2;
+  const barW=(W-padL-20)/12-4;
+  let html='';
+  for(let i=0;i<5;i++){
+    const y=H-padB-((i/4)*(H-padB-padT));
+    html+=`<line x1="${padL}" x2="${W-10}" y1="${y}" y2="${y}" stroke="#EEE" stroke-width="1" stroke-dasharray="3 3"/>`;
+    html+=`<text x="${padL-4}" y="${y+4}" text-anchor="end" font-size="9" fill="#999" font-family="JetBrains Mono,monospace">${(vals[0]*i/4*4).toFixed(2)}t</text>`;
+  }
+  months.forEach((m,i)=>{
+    const x=padL+i*(barW+4)+2;
+    const bH=(vals[i]/maxVal)*(H-padB-padT);
+    const y=H-padB-bH;
+    const isActive=i===current;
+    html+=`<rect x="${x}" y="${y}" width="${barW}" height="${bH}" rx="4" fill="${isActive?'var(--accent)':isActive?'var(--accent)':'var(--secondary)'}${isActive?'':'60'}"/>`;
+    html+=`<text x="${x+barW/2}" y="${H-padB+14}" text-anchor="middle" font-size="9" fill="#999" font-family="Satoshi,sans-serif">${m}</text>`;
+    if(isActive||vals[i]>=0.21)html+=`<text x="${x+barW/2}" y="${y-4}" text-anchor="middle" font-size="9" fill="${isActive?'var(--primary)':'#999'}" font-family="JetBrains Mono,monospace">${vals[i]}t</text>`;
+  });
+  svg.innerHTML=html;
+}
+
+// HISTORY
+function renderHist(filter='all'){
+  const list=filter==='all'?HIST:HIST.filter(h=>h.type===filter);
+  document.getElementById('histList').innerHTML=list.map(h=>`
+    <div class="hist-item ${h.type}">
+      <span class="hist-icon">${h.type==='gain'?'💰':'🎁'}</span>
+      <div class="hist-info">
+        <div class="hist-action">${h.action}</div>
+        <div class="hist-date">${h.date}</div>
+      </div>
+      <span class="hist-pts ${h.pts>0?'pts-pos':'pts-neg'}">${h.pts>0?'+':''}${h.pts} pts</span>
+    </div>
+  `).join('');
+}
+
+function showHistTab(btn,filter){
+  document.querySelectorAll('.htab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderHist(filter);
+}
+
+// REWARD TABS
+function showRTab(btn,name){
+  document.querySelectorAll('.rtab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.rtab-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('rtab-'+name).classList.add('active');
+}
+
+// USE POINTS
+function usePoints(btn,cost,label){
+  if(userPoints<cost){alert('Points insuffisants !');return;}
+  userPoints-=cost;
+  document.getElementById('modalTitle').textContent='Récompense activée !';
+  document.getElementById('modalDesc').textContent=label+' activé avec succès.';
+  document.getElementById('modalPts').textContent=`Nouveau solde : ${userPoints} pts`;
+  document.getElementById('pointsModal').classList.add('open');
+  btn.textContent='✓ Activé !';
+  btn.disabled=true;
+  btn.style.background='var(--success)';
+  btn.style.color='var(--primary)';
+}
+
+function closeModal(){document.getElementById('pointsModal').classList.remove('open');}
+
+// AI IMPACT
+async function loadAIImpact(btn){
+  btn.disabled=true;
+  btn.textContent='Génération en cours…';
+  const result=document.getElementById('aiImpactResult');
+  result.style.display='flex';
+  result.innerHTML=[90,75,85,70,80].map((w,i)=>`<div style="display:flex;gap:10px"><div style="width:24px;height:24px;background:rgba(255,255,255,.1);border-radius:50%;flex-shrink:0"></div><div style="flex:1"><div class="skeleton" style="height:12px;width:${w}%;margin-bottom:6px"></div><div class="skeleton" style="height:12px;width:${w-15}%"></div></div></div>`).join('');
+  try{
+    const prompt=`Tu es analyste environnement ClearRéno. Thomas Renard a économisé 2,4t CO2 grâce à sa PAC air/eau. Il est Éco-Acteur niveau 2. Génère une analyse engageante en JSON :
+{"headline":"1 phrase percutante sur l'impact réel dans la vie quotidienne","contexte_national":"Comparaison avec la moyenne française (1 phrase chiffrée)","equivalence_originale":"Une équivalence surprenante et mémorable (pas avions ni arbres)","projection_5ans":"Ce que représenteront 5 ans de ce rythme (1 phrase)","message_motivation":"Message encourageant vers Champion Vert (2 phrases)"}`;
+    const text=await window.claude.complete(prompt);
+    const data=JSON.parse(text);
+    result.innerHTML=[
+      {icon:'💫',label:'Impact quotidien',val:data.headline},
+      {icon:'🇫🇷',label:'Contexte national',val:data.contexte_national},
+      {icon:'🔮',label:'Équivalence originale',val:data.equivalence_originale},
+      {icon:'📅',label:'Projection 5 ans',val:data.projection_5ans},
+      {icon:'🚀',label:'Motivation',val:data.message_motivation}
+    ].map(i=>`<div class="ai-result-item"><span class="ai-result-icon">${i.icon}</span><div><div class="ai-result-label">${i.label}</div><div class="ai-result-text">${i.val}</div></div></div>`).join('');
+  } catch(e){
+    result.innerHTML=`<div class="ai-result-item"><span class="ai-result-icon">🌿</span><div class="ai-result-text">Vos 2,4t de CO₂ économisées correspondent à ne pas conduire pendant plus d'un an. En 5 ans à ce rythme, vous aurez économisé 12t de CO₂ — l'équivalent de toute la production annuelle de CO₂ d'un Français moyen. Continuez ainsi pour atteindre le niveau Champion Vert !</div></div>`;
+  }
+  btn.style.display='none';
+}
+
+// SHARE
+function selectNet(btn,net){
+  document.querySelectorAll('.net-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedNet=net;
+}
+
+async function genPost(){
+  const box=document.getElementById('sharePostBox');
+  box.textContent='Génération en cours…';
+  try{
+    const len={linkedin:'250 mots',twitter:'280 caractères max',whatsapp:'100 mots'};
+    const prompt=`Génère un post authentique pour ${selectedNet} à la 1ère personne pour Thomas Renard qui a économisé 2,4t CO2 grâce à sa PAC air/eau chez EcoTech Solutions / ClearRéno.
+Style ${selectedNet==='linkedin'?'professionnel et inspirant':'naturel et engagé'}. Longueur : ${len[selectedNet]}.
+Inclure hashtags adaptés. Pas de guillemets. Commence directement.`;
+    const text=await window.claude.complete(prompt);
+    box.textContent=text;
+  } catch(e){
+    box.textContent=`🌿 Je viens d'économiser 2,4 tonnes de CO₂ grâce à ma pompe à chaleur air/eau installée par EcoTech Solutions. En un peu plus d'un mois, c'est déjà l'équivalent de 8 vols Paris–Nice évités. Si vous envisagez une rénovation énergétique, je ne peux que recommander ClearRéno : résultats réels, suivi transparent, aides maximisées. #RénovationÉnergétique #ClearRéno #TransitionÉcologique #PompeÀChaleur`;
+  }
+}
+
+function copyPost(){
+  const text=document.getElementById('sharePostBox').textContent;
+  navigator.clipboard.writeText(text).then(()=>alert('Publication copiée dans le presse-papier !')).catch(()=>alert('Contenu copié !'));
+}
+
+// GAUGE ANIMATE
+function animateGauges(){
+  const g=document.getElementById('bigGauge');
+  if(g){const c=2*Math.PI*110;g.style.strokeDashoffset=c*(1-.63);}
+  document.querySelectorAll('.compare-fill[data-pct]').forEach(f=>{f.style.width=f.dataset.pct+'%';});
+}
+
+// FADE UP
+function initFadeUp(){
+  const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}}),{threshold:.1});
+  document.querySelectorAll('.fade-up').forEach(el=>obs.observe(el));
+  // Also trigger gauge when in view
+  const gaugeSection=document.querySelector('.gauge-wrap');
+  if(gaugeSection){const go=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){animateGauges();go.unobserve(e.target);}}),{threshold:.1});go.observe(gaugeSection);}
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  countUp(document.getElementById('co2Counter'),2.4,2000,'');
+  drawCarbonChart();
+  renderHist();
+  initFadeUp();
+  setTimeout(animateGauges,500);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClearRéno — Hub de Preuves Sociales</title>
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&f[]=satoshi@400,600,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary:#1A3C2E; --secondary:#2D6A4F; --accent:#52B788;
+  --bg:#F0FAF4; --surface:#FAFAFA; --dark:#0F1F17;
+  --text:#1A1A1A; --muted:#666666; --success:#D8F3DC; --error:#FFDDD2;
+  --font-d:'Clash Display',sans-serif; --font-b:'Satoshi',sans-serif; --font-m:'JetBrains Mono',monospace;
+  --r-card:12px; --r-badge:100px; --r-btn:8px;
+  --shadow:0 2px 8px rgba(0,0,0,.06); --shadow-lg:0 8px 24px rgba(0,0,0,.12);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-b);font-size:16px;color:var(--text);background:var(--bg);overflow-x:hidden}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-bottom:1px solid rgba(0,0,0,.06);height:72px;display:flex;align-items:center;transition:box-shadow .3s}
+nav.scrolled{box-shadow:0 4px 20px rgba(0,0,0,.08)}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;width:100%;display:flex;align-items:center;gap:32px}
+.nav-logo-name{font-family:var(--font-d);font-weight:700;font-size:22px;color:var(--primary);cursor:pointer}
+.nav-logo-sub{font-size:10px;color:var(--muted);letter-spacing:.04em}
+.nav-menu{display:flex;align-items:center;gap:4px;list-style:none;flex:1}
+.nav-menu a{font-size:14px;font-weight:600;color:var(--muted);text-decoration:none;padding:8px 12px;border-radius:6px;cursor:pointer;transition:color .2s}
+.nav-menu a:hover,.nav-menu a.active{color:var(--primary)}
+.nav-menu li.active a{color:var(--primary);position:relative}
+.nav-menu li.active a::after{content:'';position:absolute;bottom:-4px;left:12px;right:12px;height:2px;background:var(--accent);border-radius:2px}
+.nav-pill{background:var(--success);color:var(--secondary);padding:6px 12px;border-radius:var(--r-badge);font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px}
+.nav-cta{margin-left:auto}
+
+/* BTNS */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:var(--r-btn);font-family:var(--font-b);font-size:15px;font-weight:700;cursor:pointer;border:none;text-decoration:none;transition:transform .2s ease-out,box-shadow .2s ease-out;white-space:nowrap}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(82,183,136,.4)}
+.btn-secondary{background:transparent;color:var(--accent);border:2px solid var(--accent)}
+.btn-secondary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(82,183,136,.2)}
+.btn-ghost{background:transparent;color:var(--secondary);padding:10px 16px}
+.btn-ghost:hover{text-decoration:underline}
+.btn-sm{padding:8px 16px;font-size:13px}
+.btn-full{width:100%;justify-content:center}
+.btn-white{background:#fff;color:var(--primary)}
+.btn-white:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(255,255,255,.3)}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:var(--r-badge);font-size:12px;font-weight:600}
+.badge-success{background:var(--success);color:var(--primary)}
+.badge-rge{background:#E8F4FD;color:#1565C0}
+.badge-ademe{background:#E8F5E9;color:#2E7D32}
+.badge-qualibat{background:#FFF3E0;color:#E65100}
+.badge-pending{background:#FFF3CD;color:#856404}
+.badge-ai{background:#fff;color:var(--primary);font-weight:700;box-shadow:0 2px 6px rgba(0,0,0,.12)}
+
+/* LAYOUT */
+.container{max-width:1200px;margin:0 auto;padding:0 24px}
+.section{padding:80px 0}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+
+/* CARDS */
+.card{background:var(--surface);border-radius:var(--r-card);box-shadow:var(--shadow);padding:24px;border:1px solid rgba(0,0,0,.04);transition:transform .2s ease-out,box-shadow .2s ease-out}
+.card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.1)}
+
+/* HERO */
+.hero{background:var(--primary);position:relative;overflow:hidden;padding:100px 0 80px}
+.hero::before{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E");opacity:.05;pointer-events:none}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(82,183,136,.2);color:var(--accent);padding:8px 16px;border-radius:var(--r-badge);font-size:13px;font-weight:600;margin-bottom:24px;border:1px solid rgba(82,183,136,.3);animation:fadeIn .5s ease-out}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.hero-title{font-family:var(--font-d);font-weight:700;font-size:clamp(36px,5vw,56px);color:#fff;line-height:1.1;margin-bottom:20px}
+.hero-title span{color:var(--accent)}
+.hero-sub{color:rgba(255,255,255,.72);font-size:18px;line-height:1.6;max-width:560px;margin-bottom:48px}
+.hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,.1);border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.1)}
+.hero-stat{padding:24px 32px;background:rgba(255,255,255,.05);backdrop-filter:blur(4px)}
+.stat-val{font-family:var(--font-d);font-weight:700;font-size:36px;color:#fff;display:block;line-height:1}
+.stat-val span{color:var(--accent)}
+.stat-label{font-size:13px;color:rgba(255,255,255,.6);margin-top:6px;display:block}
+.partner-pills{display:flex;gap:10px;flex-wrap:wrap;margin-top:32px}
+.partner-pill{background:rgba(255,255,255,.1);color:rgba(255,255,255,.9);padding:6px 14px;border-radius:var(--r-badge);font-size:12px;font-weight:700;border:1px solid rgba(255,255,255,.15)}
+
+/* SEARCH SECTION */
+.search-section{background:#fff;border-radius:20px;box-shadow:0 8px 40px rgba(0,0,0,.12);padding:40px;margin:0 24px;margin-top:-48px;position:relative;z-index:10;max-width:1200px;margin-left:auto;margin-right:auto;margin-top:-48px}
+.tabs{display:flex;gap:0;border-bottom:2px solid rgba(0,0,0,.06);margin-bottom:28px}
+.tab-btn{padding:12px 20px;font-family:var(--font-b);font-size:15px;font-weight:700;color:var(--muted);cursor:pointer;border:none;background:transparent;border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .2s}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* AI SEARCH */
+.ai-input-wrap{position:relative;margin-bottom:16px}
+.ai-input{width:100%;height:64px;border:2px solid #DDD;border-radius:12px;padding:0 20px;font-family:var(--font-b);font-size:16px;outline:none;transition:border .2s,box-shadow .2s}
+.ai-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(82,183,136,.2)}
+.suggestion-pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.sug-pill{padding:8px 14px;border-radius:var(--r-badge);border:1.5px solid #DDD;background:#fff;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;color:var(--muted)}
+.sug-pill:hover{border-color:var(--accent);color:var(--accent)}
+.ai-loading{display:none;align-items:center;gap:10px;padding:16px;background:var(--bg);border-radius:8px;margin-bottom:16px}
+.dots span{width:6px;height:6px;background:var(--accent);border-radius:50%;display:inline-block;animation:bounce .8s infinite}
+.dots span:nth-child(2){animation-delay:.15s}
+.dots span:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,80%,100%{transform:scale(0.7)}40%{transform:scale(1)}}
+.ai-result{display:none;background:var(--success);border:1px solid var(--accent);border-radius:12px;padding:20px;margin-bottom:20px}
+.ai-result-title{font-family:var(--font-d);font-weight:600;font-size:16px;color:var(--primary);margin-bottom:8px}
+.ai-criteres{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+
+/* FILTERS */
+.filter-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.filter-pill{padding:8px 16px;border-radius:var(--r-badge);border:1.5px solid #DDD;background:#fff;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;color:var(--muted)}
+.filter-pill.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.sort-select{height:40px;border:1.5px solid #DDD;border-radius:8px;padding:0 12px;font-family:var(--font-b);font-size:14px;outline:none;background:#fff;color:var(--text);cursor:pointer}
+.search-input{height:40px;border:1.5px solid #DDD;border-radius:var(--r-badge);padding:0 16px 0 36px;font-family:var(--font-b);font-size:14px;outline:none;transition:border .2s;min-width:200px;background:#fff}
+.search-input:focus{border-color:var(--accent)}
+.search-wrap{position:relative}
+.search-wrap::before{content:'🔍';position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none}
+
+/* MATCHING CARD */
+.matching-card{background:var(--success);border-left:4px solid var(--accent);border-radius:var(--r-card);padding:24px;margin-bottom:32px;display:none}
+.matching-mini-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.matching-mini{background:#fff;border-radius:8px;padding:14px;border:1px solid rgba(82,183,136,.3)}
+.similarity-pill{background:var(--accent);color:#fff;padding:3px 8px;border-radius:var(--r-badge);font-size:11px;font-weight:700}
+
+/* CHANTIER CARDS */
+.chantier-card{background:var(--surface);border-radius:var(--r-card);box-shadow:var(--shadow);overflow:hidden;border:1px solid rgba(0,0,0,.04);transition:transform .2s ease-out,box-shadow .2s ease-out;display:flex;flex-direction:column}
+.chantier-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,.1)}
+.chantier-header{height:160px;display:flex;align-items:center;justify-content:center;position:relative;font-size:36px}
+.type-label{position:absolute;bottom:10px;left:10px;background:rgba(0,0,0,.5);color:#fff;padding:4px 10px;border-radius:var(--r-badge);font-size:11px;font-weight:700;backdrop-filter:blur(4px)}
+.ai-score-badge{position:absolute;top:10px;right:10px;background:#fff;color:var(--primary);padding:4px 10px;border-radius:var(--r-badge);font-size:11px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.15);display:none}
+.chantier-body{padding:20px;flex:1;display:flex;flex-direction:column}
+.chantier-title{font-family:var(--font-d);font-weight:600;font-size:17px;margin-bottom:6px}
+.chantier-meta{font-size:13px;color:var(--muted);margin-bottom:14px;display:flex;flex-wrap:wrap;gap:8px}
+.chantier-eco{background:var(--bg);border-radius:8px;padding:14px;margin-bottom:14px}
+.eco-val{font-family:var(--font-m);font-size:24px;font-weight:700;color:var(--primary);display:block;line-height:1}
+.eco-label{font-size:12px;color:var(--muted);margin-top:4px;display:block}
+.chantier-invest{font-size:13px;color:var(--muted);margin-bottom:10px;font-family:var(--font-m)}
+.chantier-badges{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.chantier-rating{font-size:13px;color:var(--muted);margin-bottom:12px}
+.chantier-rating span{color:#F59E0B}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.tag{padding:3px 8px;border-radius:var(--r-badge);background:var(--bg);color:var(--secondary);font-size:11px;font-weight:600}
+.chantier-actions{display:flex;gap:8px;margin-top:auto}
+.chantier-actions .btn{flex:1;justify-content:center}
+
+/* SECTION AVIS */
+.avis-section{background:#fff;padding:80px 0}
+.avis-gauge-wrap{display:flex;justify-content:center;position:relative;margin:32px auto;width:200px;height:200px}
+.avis-gauge-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.avis-val{font-family:var(--font-d);font-weight:700;font-size:40px;color:var(--primary)}
+.avis-sub{font-size:12px;color:var(--muted);margin-top:4px}
+.theme-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px}
+.theme-card{background:var(--surface);border-radius:var(--r-card);padding:20px;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,.04)}
+.theme-icon{font-size:24px;margin-bottom:10px}
+.theme-label{font-family:var(--font-d);font-weight:600;font-size:15px;margin-bottom:8px}
+.theme-pct{font-family:var(--font-m);font-size:18px;font-weight:700;color:var(--accent);margin-bottom:8px}
+.theme-bar{height:8px;background:#EEE;border-radius:100px;overflow:hidden;margin-bottom:10px}
+.theme-bar-fill{height:100%;background:var(--accent);border-radius:100px;transition:width 1.5s ease-out;width:0}
+.theme-verbatim{font-size:12px;color:var(--muted);font-style:italic}
+
+/* PARTENAIRES */
+.partner-section{padding:64px 0;background:var(--bg)}
+.partner-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:40px}
+.partner-card{background:#fff;border-radius:var(--r-card);padding:28px;box-shadow:var(--shadow);text-align:center;border:1px solid rgba(0,0,0,.04)}
+.partner-logo{font-family:var(--font-d);font-weight:700;font-size:22px;color:var(--primary);margin-bottom:10px}
+.transparence{background:#fff;border-radius:var(--r-card);padding:32px;margin-top:32px;box-shadow:var(--shadow)}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.5);overflow-y:auto}
+.modal-overlay.open{display:block}
+.modal{background:#fff;max-width:1100px;width:calc(100% - 48px);margin:80px auto 24px;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.2);animation:slideUp .35s ease-out;position:relative}
+@keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.modal-close{position:sticky;top:16px;left:calc(100% - 48px);width:36px;height:36px;border-radius:50%;border:none;background:rgba(0,0,0,.08);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;z-index:10;transition:background .2s}
+.modal-close:hover{background:rgba(0,0,0,.15)}
+.modal-hero{height:280px;display:flex;align-items:center;justify-content:center;border-radius:20px 20px 0 0;position:relative;overflow:hidden}
+.modal-breadcrumb{position:absolute;top:16px;left:16px;font-size:12px;color:rgba(255,255,255,.7)}
+.modal-verified{position:absolute;top:16px;right:56px;background:rgba(255,255,255,.2);color:#fff;padding:6px 12px;border-radius:var(--r-badge);font-size:12px;font-weight:700;border:1px solid rgba(255,255,255,.3)}
+.modal-content{display:grid;grid-template-columns:1fr 340px;gap:32px;padding:32px}
+.gallery{margin-bottom:28px}
+.gallery-slides{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+.gallery-slide{aspect-ratio:4/3;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer;transition:opacity .2s;border:2px solid transparent}
+.gallery-slide.active{border-color:var(--accent)}
+.chart-wrap{margin-bottom:28px}
+.chart-title{font-family:var(--font-d);font-weight:600;font-size:18px;margin-bottom:16px}
+.ai-analysis{background:var(--bg);border:1px solid rgba(82,183,136,.3);border-radius:12px;padding:24px;margin-bottom:28px}
+.ai-analysis-header{display:flex;align-items:center;gap:8px;margin-bottom:16px}
+.ai-item{display:flex;gap:12px;margin-bottom:14px;align-items:flex-start}
+.ai-item-icon{font-size:20px;flex-shrink:0;margin-top:2px}
+.ai-item-content{font-size:14px;line-height:1.5;color:var(--text)}
+.ai-item-label{font-weight:700;color:var(--primary);margin-bottom:2px;font-family:var(--font-d);font-size:13px}
+.testimonial-block{background:var(--bg);border-radius:12px;padding:24px;margin-bottom:20px}
+.testimonial-quote{font-family:var(--font-d);font-size:18px;font-style:italic;color:var(--primary);line-height:1.4;margin-bottom:12px}
+.sticky-card{position:sticky;top:80px;background:var(--bg);border-radius:16px;padding:24px}
+.sticky-eco{font-family:var(--font-d);font-weight:700;font-size:36px;color:var(--accent);display:block;margin-bottom:16px}
+.metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.metric-item .metric-val{font-family:var(--font-m);font-size:15px;font-weight:700;color:var(--primary)}
+.metric-item .metric-label{font-size:11px;color:var(--muted);margin-top:2px}
+.aides-list li{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(0,0,0,.06);font-size:14px;list-style:none}
+.aides-list li:last-child{border:none}
+.aide-total-box{background:var(--success);border-radius:8px;padding:14px;display:flex;justify-content:space-between;margin-top:12px;font-weight:700;color:var(--primary)}
+
+/* CHATBOT */
+.chatbot-btn{position:fixed;bottom:32px;right:32px;width:56px;height:56px;border-radius:50%;background:var(--accent);color:#fff;font-size:24px;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(82,183,136,.4);z-index:1500;transition:transform .2s;display:none}
+.chatbot-btn:hover{transform:scale(1.1)}
+.chatbot-btn.modal-open{display:flex;align-items:center;justify-content:center}
+.chatbot-drawer{position:fixed;right:0;top:0;bottom:0;width:380px;background:#fff;box-shadow:-4px 0 24px rgba(0,0,0,.15);z-index:1600;transform:translateX(100%);transition:transform .35s ease-out;display:flex;flex-direction:column}
+.chatbot-drawer.open{transform:translateX(0)}
+.drawer-header{background:var(--primary);padding:20px;color:#fff;flex-shrink:0}
+.drawer-title{font-family:var(--font-d);font-weight:700;font-size:16px}
+.drawer-sub{font-size:12px;color:rgba(255,255,255,.65);margin-top:4px}
+.drawer-close{position:absolute;top:16px;right:16px;width:28px;height:28px;border-radius:50%;border:none;background:rgba(255,255,255,.2);color:#fff;cursor:pointer;font-size:14px}
+.suggested-qs{display:flex;flex-direction:column;gap:8px;padding:16px;border-bottom:1px solid rgba(0,0,0,.06);flex-shrink:0}
+.sug-q{padding:10px 14px;border-radius:8px;border:1.5px solid rgba(82,183,136,.3);background:var(--bg);font-size:13px;cursor:pointer;transition:all .2s;text-align:left}
+.sug-q:hover{border-color:var(--accent);background:var(--success)}
+.chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.chat-bubble{max-width:85%;border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.5}
+.bubble-assistant{background:var(--bg);border-radius:12px 12px 12px 0;align-self:flex-start}
+.bubble-user{background:var(--accent);color:#fff;border-radius:12px 12px 0 12px;align-self:flex-end}
+.typing-indicator{background:var(--bg);border-radius:12px 12px 12px 0;padding:12px 14px;align-self:flex-start;display:flex;gap:4px;align-items:center}
+.chat-input-wrap{padding:16px;border-top:1px solid rgba(0,0,0,.06);display:flex;gap:10px;flex-shrink:0}
+.chat-input{flex:1;height:42px;border:1.5px solid #DDD;border-radius:100px;padding:0 16px;font-family:var(--font-b);font-size:14px;outline:none;transition:border .2s}
+.chat-input:focus{border-color:var(--accent)}
+
+/* SKELETON */
+.skeleton{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px}
+@keyframes shimmer{from{background-position:200% 0}to{background-position:-200% 0}}
+
+/* CTA FINAL */
+.cta-final{background:linear-gradient(135deg,var(--primary),var(--secondary));padding:80px 0;text-align:center;color:#fff}
+.cta-final h2{font-family:var(--font-d);font-weight:700;font-size:40px;margin-bottom:12px}
+.cta-final p{font-size:18px;color:rgba(255,255,255,.85);margin-bottom:40px}
+.cta-reassurance{font-size:13px;color:rgba(255,255,255,.6);margin-top:20px}
+
+/* FOOTER */
+footer{background:var(--dark);color:rgba(255,255,255,.75);padding:64px 0 32px}
+.footer-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1.2fr;gap:48px;margin-bottom:48px}
+.footer-logo{font-family:var(--font-d);font-weight:700;font-size:22px;color:#fff;margin-bottom:8px}
+.footer-col h4{color:#fff;font-family:var(--font-d);font-weight:600;font-size:14px;margin-bottom:16px;text-transform:uppercase;letter-spacing:.06em}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.footer-col ul a{color:rgba(255,255,255,.55);font-size:14px;text-decoration:none;transition:color .2s;cursor:pointer}
+.footer-col ul a:hover{color:var(--accent)}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.08);padding-top:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.footer-links{display:flex;gap:16px;flex-wrap:wrap}
+.footer-links a{color:rgba(255,255,255,.4);text-decoration:none;font-size:12px}
+
+/* FADE UP */
+.fade-up{opacity:0;transform:translateY(40px);transition:opacity .6s ease-out,transform .6s ease-out}
+.fade-up.visible{opacity:1;transform:translateY(0)}
+
+/* RESPONSIVE */
+@media(max-width:1024px){.grid-3,.theme-cards,.partner-cards{grid-template-columns:repeat(2,1fr)}.modal-content{grid-template-columns:1fr}.sticky-card{position:relative;top:0}}
+@media(max-width:768px){.hero-stats{grid-template-columns:1fr}.grid-3,.grid-2{grid-template-columns:1fr}.footer-grid{grid-template-columns:1fr 1fr}.nav-menu{display:none}.chatbot-drawer{width:100%}.matching-mini-cards{grid-template-columns:1fr}.gallery-slides{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <div>
+      <div class="nav-logo-name">ClearRéno</div>
+      <div class="nav-logo-sub">par EcoTech Solutions</div>
+    </div>
+    <ul class="nav-menu">
+      <li class="active"><a>Toutes les réalisations</a></li>
+      <li><a>Certifications</a></li>
+      <li><a>Partenaires</a></li>
+      <li><a onclick="showMatching()">✨ Recherche IA</a></li>
+    </ul>
+    <div class="nav-pill">🔒 Données vérifiées ADEME</div>
+    <div class="nav-cta" style="margin-left:16px">
+      <button class="btn btn-primary btn-sm">Simuler mes économies</button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero" style="padding-top:120px">
+  <div class="container" style="position:relative;z-index:1">
+    <div class="hero-badge">✓ 847 chantiers documentés — Données certifiées ADEME — Màj mensuelle</div>
+    <h1 class="hero-title">Des résultats réels.<br><span>Vérifiés. Partagés.</span></h1>
+    <p class="hero-sub">Chaque chantier EcoTech est documenté, mesuré et validé par des tiers indépendants. Pas de promesses — des preuves.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><span class="stat-val" data-count="847">0</span><span class="stat-label">Chantiers réalisés</span></div>
+      <div class="hero-stat"><span class="stat-val" data-count="12400">0</span><span class="stat-label">MWh économisés</span></div>
+      <div class="hero-stat"><span class="stat-val" data-decimal="4.9" data-suffix="/5">0</span><span class="stat-label">Satisfaction — 6 240 avis</span></div>
+    </div>
+    <div class="partner-pills">
+      <span class="partner-pill">ADEME validé</span>
+      <span class="partner-pill">RGE certifié</span>
+      <span class="partner-pill">Qualibat</span>
+      <span class="partner-pill">Datadock</span>
+    </div>
+  </div>
+</div>
+
+<!-- SEARCH SECTION -->
+<div style="padding:0 24px">
+  <div class="search-section">
+    <h2 style="font-family:var(--font-d);font-weight:600;font-size:24px;text-align:center;margin-bottom:24px;color:var(--primary)">Trouvez un chantier similaire au vôtre</h2>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('ai')">✨ Recherche intelligente (IA)</button>
+      <button class="tab-btn" onclick="switchTab('filters')">🔧 Filtres avancés</button>
+    </div>
+
+    <!-- AI Tab -->
+    <div class="tab-panel active" id="tab-ai">
+      <div class="ai-input-wrap">
+        <input class="ai-input" id="aiQuery" type="text" placeholder='Ex : "maison de 130m² construite en 1978, chauffage fioul, région parisienne"'>
+      </div>
+      <div class="suggestion-pills">
+        <span class="sug-pill" onclick="fillQuery(this)">Maison des années 70 avec fioul</span>
+        <span class="sug-pill" onclick="fillQuery(this)">Appartement haussmannien Paris</span>
+        <span class="sug-pill" onclick="fillQuery(this)">Pavillon 150m² Grand Est</span>
+        <span class="sug-pill" onclick="fillQuery(this)">Immeuble collectif rénovation globale</span>
+      </div>
+      <button class="btn btn-primary btn-full" id="aiSearchBtn" onclick="doAISearch()">🔍 Rechercher avec l'IA</button>
+      <div class="ai-loading" id="aiLoading">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span style="font-size:14px;color:var(--muted)">L'IA analyse votre profil...</span>
+      </div>
+      <div class="ai-result" id="aiResult">
+        <div class="ai-result-title" id="aiResultTitle"></div>
+        <div id="aiResultText" style="font-size:14px;color:var(--text)"></div>
+        <div class="ai-criteres" id="aiCriteres"></div>
+      </div>
+    </div>
+
+    <!-- Filters Tab -->
+    <div class="tab-panel" id="tab-filters">
+      <div class="filter-row mb" style="margin-bottom:16px">
+        <div id="filterPills" style="display:flex;gap:8px;flex-wrap:wrap">
+          <span class="filter-pill active" data-filter="all">Tous ✓</span>
+          <span class="filter-pill" data-filter="pac_aireau">PAC air/eau</span>
+          <span class="filter-pill" data-filter="pac_airair">PAC air/air</span>
+          <span class="filter-pill" data-filter="isolation">Isolation</span>
+          <span class="filter-pill" data-filter="vmc">VMC</span>
+          <span class="filter-pill" data-filter="pack">Pack global</span>
+        </div>
+        <div class="search-wrap" style="margin-left:auto">
+          <input class="search-input" id="citySearch" placeholder="Ville..." oninput="renderGrid()">
+        </div>
+        <select class="sort-select" id="sortSelect" onchange="renderGrid()">
+          <option value="eco">Par économies ↓</option>
+          <option value="note">Par note</option>
+          <option value="roi">Par ROI</option>
+        </select>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="resetFilters()">Réinitialiser les filtres</button>
+    </div>
+  </div>
+</div>
+
+<!-- MATCHING -->
+<div class="container" style="margin-top:32px">
+  <div class="matching-card" id="matchingCard">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+      <span style="font-size:20px">✨</span>
+      <span style="font-family:var(--font-d);font-weight:700;font-size:18px;color:var(--primary)">Sélection personnalisée pour votre projet</span>
+    </div>
+    <p style="font-size:14px;color:var(--secondary);margin-bottom:16px">Sur la base de votre simulation (maison 145m², fioul, Reims), l'IA a identifié les 3 chantiers les plus proches.</p>
+    <div class="matching-mini-cards">
+      <div class="matching-mini"><div style="font-weight:700;font-size:14px;margin-bottom:4px">Reims (51) — PAC air/eau</div><div style="font-size:12px;color:var(--muted)">145m² · Similarité <span class="similarity-pill">94%</span></div><div style="font-size:12px;margin-top:6px;color:var(--secondary)">Surface et localisation identiques</div></div>
+      <div class="matching-mini"><div style="font-weight:700;font-size:14px;margin-bottom:4px">Épernay (51) — PAC air/eau</div><div style="font-size:12px;color:var(--muted)">130m² · Similarité <span class="similarity-pill">87%</span></div><div style="font-size:12px;margin-top:6px;color:var(--secondary)">Même type de chauffage</div></div>
+      <div class="matching-mini"><div style="font-weight:700;font-size:14px;margin-bottom:4px">Strasbourg (67) — PAC air/eau</div><div style="font-size:12px;color:var(--muted)">180m² · Similarité <span class="similarity-pill">78%</span></div><div style="font-size:12px;margin-top:6px;color:var(--secondary)">Profil fioul identique</div></div>
+    </div>
+  </div>
+
+  <!-- GRID -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px" id="chantiersGrid"></div>
+  <div style="text-align:center;margin-top:16px;font-size:14px;color:var(--muted)" id="noResults" style="display:none"></div>
+</div>
+
+<!-- AVIS SECTION -->
+<div class="avis-section" style="margin-top:64px">
+  <div class="container">
+    <div class="text-center" style="text-align:center">
+      <div class="badge badge-success" style="margin-bottom:16px;font-size:13px">Analyse IA sur 6 240 avis vérifiés — Màj 1er mai 2026</div>
+      <h2 style="font-family:var(--font-d);font-weight:600;font-size:36px;color:var(--primary);margin-bottom:8px">Ce que nos clients disent vraiment</h2>
+      <p style="color:var(--muted);font-size:16px">L'IA analyse 6 240 avis clients pour identifier les thèmes récurrents</p>
+    </div>
+    <div class="avis-gauge-wrap fade-up" style="width:200px;height:200px">
+      <svg width="200" height="200" viewBox="0 0 200 200">
+        <circle cx="100" cy="100" r="80" fill="none" stroke="#EEE" stroke-width="16"/>
+        <circle cx="100" cy="100" r="80" fill="none" stroke="var(--accent)" stroke-width="16"
+          stroke-dasharray="502.65" stroke-dashoffset="502.65" stroke-linecap="round"
+          transform="rotate(-90 100 100)" id="avisGauge" style="transition:stroke-dashoffset 2s ease-out"/>
+      </svg>
+      <div class="avis-gauge-center">
+        <div class="avis-val">4,9</div>
+        <div class="avis-sub">Score confiance</div>
+      </div>
+    </div>
+    <div class="theme-cards">
+      <div class="theme-card fade-up"><div class="theme-icon">⏱️</div><div class="theme-label">Ponctualité</div><div class="theme-pct">94%</div><div class="theme-bar"><div class="theme-bar-fill" data-pct="94"></div></div><div class="theme-verbatim">« Arrivés à l'heure exacte, comme prévu »</div></div>
+      <div class="theme-card fade-up" style="transition-delay:.1s"><div class="theme-icon">🧹</div><div class="theme-label">Propreté chantier</div><div class="theme-pct">97%</div><div class="theme-bar"><div class="theme-bar-fill" data-pct="97"></div></div><div class="theme-verbatim">« Aucune poussière, rien à nettoyer »</div></div>
+      <div class="theme-card fade-up" style="transition-delay:.2s"><div class="theme-icon">📱</div><div class="theme-label">Qualité du suivi</div><div class="theme-pct">91%</div><div class="theme-bar"><div class="theme-bar-fill" data-pct="91"></div></div><div class="theme-verbatim">« L'application ClearRéno est au top »</div></div>
+      <div class="theme-card fade-up" style="transition-delay:.3s"><div class="theme-icon">💰</div><div class="theme-label">Transparence coûts</div><div class="theme-pct">89%</div><div class="theme-bar"><div class="theme-bar-fill" data-pct="89"></div></div><div class="theme-verbatim">« Aucune mauvaise surprise sur le devis »</div></div>
+      <div class="theme-card fade-up" style="transition-delay:.4s"><div class="theme-icon">✅</div><div class="theme-label">Simulation conforme</div><div class="theme-pct">88%</div><div class="theme-bar"><div class="theme-bar-fill" data-pct="88"></div></div><div class="theme-verbatim">« Exactement ce qui était annoncé »</div></div>
+      <div class="theme-card fade-up" style="transition-delay:.5s"><div class="theme-icon">📅</div><div class="theme-label">Délais respectés</div><div class="theme-pct">86%</div><div class="theme-bar"><div class="theme-bar-fill" data-pct="86"></div></div><div class="theme-verbatim">« Terminé avant la date prévue »</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- PARTENAIRES -->
+<div class="partner-section">
+  <div class="container">
+    <h2 style="font-family:var(--font-d);font-weight:600;font-size:32px;color:var(--primary);text-align:center;margin-bottom:8px">Les tiers qui valident nos données</h2>
+    <div class="partner-cards">
+      <div class="partner-card fade-up"><div class="partner-logo">ADEME</div><p style="font-size:14px;color:var(--muted)">Valide nos mesures d'économies d'énergie selon le protocole officiel</p></div>
+      <div class="partner-card fade-up" style="transition-delay:.1s"><div class="partner-logo">Qualibat</div><p style="font-size:14px;color:var(--muted)">Certifie nos qualifications RGE et garantit notre expertise technique</p></div>
+      <div class="partner-card fade-up" style="transition-delay:.2s"><div class="partner-logo">ATEE</div><p style="font-size:14px;color:var(--muted)">Valide nos Certificats d'Économies d'Énergie (CEE)</p></div>
+    </div>
+    <div class="transparence fade-up">
+      <h3 style="font-family:var(--font-d);font-weight:600;font-size:20px;color:var(--primary);margin-bottom:16px">🔍 Comment calculons-nous les économies ?</h3>
+      <p style="font-size:15px;line-height:1.7;color:var(--text)">Nos économies sont calculées par comparaison des factures énergétiques réelles sur 12 mois avant et après travaux. Le protocole de mesure est réalisé par un tiers indépendant certifié ADEME. Les données sont vérifiées et mises à jour mensuellement. Aucune estimation théorique — uniquement des mesures réelles sur des chantiers livrés.</p>
+    </div>
+  </div>
+</div>
+
+<!-- CTA FINAL -->
+<div class="cta-final">
+  <div class="container">
+    <h2>Vous avez vu des chantiers similaires au vôtre ?</h2>
+    <p>Obtenez votre estimation personnalisée en 3 minutes — sans engagement</p>
+    <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-white">Simuler mes économies</button>
+      <button class="btn btn-secondary" style="border-color:rgba(255,255,255,.5);color:#fff">Contacter un expert</button>
+    </div>
+    <p class="cta-reassurance">Sans engagement · Résultats immédiats · Données sécurisées RGPD</p>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div><div class="footer-logo">ClearRéno</div><p style="font-size:13px;color:rgba(255,255,255,.5);margin-bottom:16px">La plateforme de rénovation énergétique par EcoTech Solutions</p><div style="display:flex;gap:8px"><span class="badge badge-rge">RGE</span><span class="badge badge-ademe">ADEME</span><span class="badge badge-qualibat">Qualibat</span></div></div>
+      <div class="footer-col"><h4>Modules</h4><ul><li><a>Hub de preuves</a></li><li><a>Simulateur IA</a></li><li><a>Suivi chantier</a></li><li><a>Score carbone</a></li><li><a>Jumeau 3D</a></li></ul></div>
+      <div class="footer-col"><h4>Entreprise</h4><ul><li><a>À propos</a></li><li><a>Certifications</a></li><li><a>Recrutement</a></li><li><a>Presse</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a>contact@clearreno.fr</a></li><li><a>03 26 XX XX XX</a></li><li><a>Reims, Grand Est</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span style="font-size:12px;color:rgba(255,255,255,.3)">© 2026 EcoTech Solutions — ClearRéno v1.0</span>
+      <div class="footer-links"><a>Mentions légales</a><a>CGV</a><a>RGPD</a><a>Cookies</a></div>
+    </div>
+  </div>
+</footer>
+
+<!-- MODAL DÉTAIL -->
+<div class="modal-overlay" id="detailModal" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<!-- CHATBOT -->
+<button class="chatbot-btn" id="chatbotBtn" onclick="toggleChatbot()" title="Poser une question">💬</button>
+<div class="chatbot-drawer" id="chatbotDrawer">
+  <div class="drawer-header" style="position:relative">
+    <div class="drawer-title" id="drawerTitle">Assistant ClearRéno</div>
+    <div class="drawer-sub" id="drawerSub">Je connais tous les détails de ce chantier.</div>
+    <button class="drawer-close" onclick="toggleChatbot()">✕</button>
+  </div>
+  <div class="suggested-qs" id="suggestedQs"></div>
+  <div class="chat-messages" id="chatMessages"></div>
+  <div class="chat-input-wrap">
+    <input class="chat-input" id="chatInput" placeholder="Votre question..." onkeydown="if(event.key==='Enter')sendChat()">
+    <button class="btn btn-primary btn-sm" onclick="sendChat()">Envoyer</button>
+  </div>
+  <div style="padding:12px 16px;border-top:1px solid rgba(0,0,0,.06)">
+    <button class="btn btn-primary btn-full btn-sm">🚀 Simuler mon projet</button>
+  </div>
+</div>
+
+<script>
+// ===== DATABASE =====
+const DB = [
+  {id:"ch001",type:"pac_aireau",label:"Pompe à chaleur air/eau",ville:"Reims",dep:"51",surface:145,annee:1972,chauffage:"fioul",facture_avant:3200,facture_apres:890,eco_euros:2310,eco_kwh:18500,invest_ht:18500,roi:8,certif:["RGE","ADEME"],note:5.0,nb_avis:12,tags:["Ponctuel","Propre","Suivi excellent"],equipement:"Daikin Altherma 3 11kW",duree:"4 jours",aides:{maprimerenov:5000,cee:1200,locale:800},temoignage:"Marie T., Reims — Propriétaire : « 2 310€/an économisés, exactement comme simulé. EcoTech a tout documenté. »",gradient:"linear-gradient(135deg,#1A3C2E,#52B788)"},
+  {id:"ch002",type:"isolation",label:"ITE + Isolation combles",ville:"Épernay",dep:"51",surface:98,annee:1968,chauffage:"gaz",facture_avant:2100,facture_apres:1050,eco_euros:1050,eco_kwh:9800,invest_ht:22000,roi:11,certif:["Qualibat","RGE"],note:4.8,nb_avis:8,tags:["Travail soigné","Délais respectés","Bon conseil"],equipement:"Rockwool 200mm + Weber",duree:"12 jours",aides:{maprimerenov:7000,cee:2100,locale:0},temoignage:"Jean-Pierre M., Épernay : « La façade est méconnaissable. »",gradient:"linear-gradient(135deg,#1B4332,#40916C)"},
+  {id:"ch003",type:"vmc",label:"VMC double flux",ville:"Châlons-en-Champagne",dep:"51",surface:120,annee:1985,chauffage:"electrique",facture_avant:1800,facture_apres:1150,eco_euros:650,eco_kwh:5200,invest_ht:4500,roi:7,certif:["RGE"],note:4.9,nb_avis:6,tags:["Rapide","Silencieux","Bonne qualité air"],equipement:"Zehnder ComfoAir Q350",duree:"2 jours",aides:{maprimerenov:1000,cee:500,locale:0},temoignage:"Sophie L. : « L'air est vraiment différent. »",gradient:"linear-gradient(135deg,#081C15,#2D6A4F)"},
+  {id:"ch004",type:"pack",label:"Pack rénovation globale",ville:"Nancy",dep:"54",surface:210,annee:1960,chauffage:"fioul",facture_avant:5600,facture_apres:1800,eco_euros:3800,eco_kwh:32000,invest_ht:38000,roi:10,certif:["ADEME","RGE","Qualibat"],note:5.0,nb_avis:23,tags:["Chef de projet réactif","Zéro mauvaise surprise","Suivi app excellent"],equipement:"PAC Viessmann 14kW + ITE + VMC",duree:"18 jours",aides:{maprimerenov:12000,cee:3500,locale:1200},temoignage:"François D. : « 38 000€ qui rapportent 3 800€/an. »",gradient:"linear-gradient(135deg,#0F1F17,#1A3C2E)"},
+  {id:"ch005",type:"pac_airair",label:"PAC air/air multi-split",ville:"Troyes",dep:"10",surface:75,annee:2001,chauffage:"electrique",facture_avant:1900,facture_apres:980,eco_euros:920,eco_kwh:7400,invest_ht:5500,roi:6,certif:["RGE"],note:4.7,nb_avis:5,tags:["Installation propre","Silencieux","Bon rapport qualité/prix"],equipement:"Mitsubishi Electric MSZ-HR",duree:"1 jour",aides:{maprimerenov:1200,cee:400,locale:0},temoignage:"Amandine K. : « Installé en une journée, impeccable. »",gradient:"linear-gradient(135deg,#52796F,#84A98C)"},
+  {id:"ch006",type:"isolation",label:"Isolation murs intérieur",ville:"Metz",dep:"57",surface:160,annee:1975,chauffage:"gaz",facture_avant:2800,facture_apres:2020,eco_euros:780,eco_kwh:6200,invest_ht:9500,roi:12,certif:["Qualibat","RGE"],note:4.9,nb_avis:11,tags:["Propre","Devis clair","Bonne isolation phonique"],equipement:"Doublage Knauf Therm + BA13",duree:"8 jours",aides:{maprimerenov:3000,cee:900,locale:0},temoignage:"Patrick V. : « Les murs sont chauds au toucher. »",gradient:"linear-gradient(135deg,#354F52,#84A98C)"},
+  {id:"ch007",type:"pac_aireau",label:"PAC air/eau haute température",ville:"Strasbourg",dep:"67",surface:180,annee:1958,chauffage:"fioul",facture_avant:4200,facture_apres:1400,eco_euros:2800,eco_kwh:22400,invest_ht:21000,roi:7.5,certif:["ADEME","RGE"],note:5.0,nb_avis:17,tags:["Prise en charge complète","Dossier aides géré","Pro"],equipement:"Atlantic Alfea Excellia Duo 14kW",duree:"3 jours",aides:{maprimerenov:6000,cee:1800,locale:1000},temoignage:"Véronique M. : « EcoTech s'est occupé de tout le dossier. »",gradient:"linear-gradient(135deg,#1A3C2E,#52B788)"},
+  {id:"ch008",type:"pack",label:"Rénovation globale B2B",ville:"Lyon",dep:"69",surface:850,annee:1980,chauffage:"gaz",facture_avant:28000,facture_apres:11000,eco_euros:17000,eco_kwh:136000,invest_ht:95000,roi:5.6,certif:["ADEME","RGE","Qualibat"],note:4.9,nb_avis:4,tags:["Rapport RSE fourni","Équipe dédiée","Coordination parfaite"],equipement:"PAC centralisée + ITE + VMC",duree:"45 jours",aides:{maprimerenov:0,cee:12000,locale:5000},temoignage:"Directeur Immobilier Nexity : « 17 000€/an d'économies. »",gradient:"linear-gradient(135deg,#0F1F17,#2D6A4F)"},
+  {id:"ch009",type:"isolation",label:"Isolation combles perdus",ville:"Dijon",dep:"21",surface:110,annee:1990,chauffage:"electrique",facture_avant:2200,facture_apres:1540,eco_euros:660,eco_kwh:5300,invest_ht:3200,roi:4.8,certif:["RGE","ADEME"],note:4.8,nb_avis:9,tags:["Rapide","Pas de poussière","Résultat immédiat"],equipement:"Laine soufflée Isofloc 300mm",duree:"1 jour",aides:{maprimerenov:1800,cee:600,locale:200},temoignage:"Laurence B. : « Résultat visible dès le mois suivant. »",gradient:"linear-gradient(135deg,#2D6A4F,#52B788)"},
+  {id:"ch010",type:"pac_aireau",label:"PAC + plancher chauffant",ville:"Bordeaux",dep:"33",surface:165,annee:2005,chauffage:"gaz",facture_avant:2600,facture_apres:950,eco_euros:1650,eco_kwh:13200,invest_ht:24000,roi:14.5,certif:["RGE","Qualibat"],note:4.9,nb_avis:14,tags:["Confort thermique","Plancher agréable","Équipe sympa"],equipement:"Daikin Altherma 3 R 14kW + plancher",duree:"6 jours",aides:{maprimerenov:4000,cee:1500,locale:0},temoignage:"Thomas G. : « Un confort qu'on ne connaissait pas. »",gradient:"linear-gradient(135deg,#1A3C2E,#40916C)"},
+  {id:"ch011",type:"vmc",label:"VMC + traitement humidité",ville:"Nantes",dep:"44",surface:95,annee:1978,chauffage:"gaz",facture_avant:1600,facture_apres:1100,eco_euros:500,eco_kwh:4000,invest_ht:5800,roi:11.6,certif:["RGE"],note:4.7,nb_avis:7,tags:["Problème humidité résolu","Silence parfait","Professionnel"],equipement:"Zehnder ComfoAir Q250",duree:"2 jours",aides:{maprimerenov:1000,cee:400,locale:0},temoignage:"Claire D. : « Les moisissures ont disparu en 3 semaines. »",gradient:"linear-gradient(135deg,#354F52,#52B788)"},
+  {id:"ch012",type:"pack",label:"Pack isolation + VMC",ville:"Toulouse",dep:"31",surface:135,annee:1965,chauffage:"fioul",facture_avant:3800,facture_apres:1600,eco_euros:2200,eco_kwh:17600,invest_ht:31000,roi:14,certif:["ADEME","RGE","Qualibat"],note:5.0,nb_avis:19,tags:["Accompagnement A à Z","Aides maximisées","Avant/après bluffant"],equipement:"ITE Sto 160mm + Combles + VMC",duree:"22 jours",aides:{maprimerenov:9000,cee:2800,locale:1500},temoignage:"Isabelle C. : « 13 300€ d'aides récupérés. »",gradient:"linear-gradient(135deg,#0F1F17,#1A3C2E)"}
+];
+
+let currentFilter = 'all';
+let currentChantier = null;
+let chatHistory = [];
+let chatbotOpen = false;
+
+// COUNT UP
+function countUp(el,target,duration=1800,isDecimal=false,suffix=''){
+  const start=performance.now();
+  function step(now){
+    const p=Math.min((now-start)/duration,1);
+    const e=1-Math.pow(1-p,3);
+    const v=e*target;
+    el.textContent=(isDecimal?v.toFixed(1):Math.floor(v).toLocaleString('fr-FR'))+suffix;
+    if(p<1)requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+const counted=new Set();
+function initCounters(){
+  document.querySelectorAll('[data-count],[data-decimal]').forEach(el=>{
+    if(counted.has(el))return;
+    if(el.hasAttribute('data-decimal')){
+      countUp(el,parseFloat(el.dataset.decimal),1800,true,el.dataset.suffix||'');
+    } else {
+      countUp(el,parseInt(el.dataset.count),1800,false,'');
+    }
+    counted.add(el);
+  });
+}
+setTimeout(initCounters,300);
+
+// TABS
+function switchTab(t){
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',['ai','filters'][i]===t));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+}
+
+// FILTER PILLS
+document.getElementById('filterPills').addEventListener('click',e=>{
+  if(e.target.classList.contains('filter-pill')){
+    document.querySelectorAll('.filter-pill').forEach(p=>p.classList.remove('active'));
+    e.target.classList.add('active');
+    currentFilter=e.target.dataset.filter;
+    renderGrid();
+  }
+});
+
+function resetFilters(){
+  currentFilter='all';
+  document.querySelectorAll('.filter-pill').forEach(p=>p.classList.remove('active'));
+  document.querySelector('[data-filter="all"]').classList.add('active');
+  document.getElementById('citySearch').value='';
+  document.getElementById('sortSelect').value='eco';
+  renderGrid();
+}
+
+// RENDER GRID
+function renderGrid(aiResults=null,aiScores={}){
+  const grid=document.getElementById('chantiersGrid');
+  let list=aiResults||DB;
+  if(!aiResults){
+    const search=(document.getElementById('citySearch')?.value||'').toLowerCase();
+    list=DB.filter(c=>{
+      const matchType=currentFilter==='all'||c.type===currentFilter;
+      const matchSearch=!search||c.ville.toLowerCase().includes(search);
+      return matchType&&matchSearch;
+    });
+    const sort=document.getElementById('sortSelect')?.value||'eco';
+    if(sort==='eco')list.sort((a,b)=>b.eco_euros-a.eco_euros);
+    else if(sort==='note')list.sort((a,b)=>b.note-a.note);
+    else if(sort==='roi')list.sort((a,b)=>a.roi-b.roi);
+  }
+  grid.innerHTML=list.map(c=>`
+    <div class="chantier-card fade-up" data-type="${c.type}">
+      <div class="chantier-header" style="background:${c.gradient}">
+        <div>${c.type==='pac_aireau'?'♨️':c.type==='pac_airair'?'💨':c.type==='isolation'?'🧱':c.type==='vmc'?'🌀':'⭐'}</div>
+        <span class="type-label">${c.label}</span>
+        ${aiScores[c.id]?`<span class="ai-score-badge" style="display:inline-flex">IA : ${aiScores[c.id]}%</span>`:''}
+      </div>
+      <div class="chantier-body">
+        <div class="chantier-title">${c.label}</div>
+        <div class="chantier-meta">
+          <span>📍 ${c.ville} (${c.dep})</span>
+          <span>🏠 ${c.surface} m²</span>
+          <span>🗓️ ${c.duree}</span>
+        </div>
+        <div class="chantier-eco">
+          <span class="eco-val">−${c.eco_euros.toLocaleString('fr-FR')} €/an</span>
+          <span class="eco-label">économisées sur la facture · ROI ${c.roi} ans</span>
+        </div>
+        <div class="chantier-invest">Invest. ${c.invest_ht.toLocaleString('fr-FR')} € HT</div>
+        <div class="chantier-badges">
+          ${c.certif.map(b=>`<span class="badge ${b==='RGE'?'badge-rge':b==='ADEME'?'badge-ademe':'badge-qualibat'}">${b}</span>`).join('')}
+        </div>
+        <div class="chantier-rating"><span>★</span> ${c.note} <span style="color:var(--muted)">(${c.nb_avis} avis)</span></div>
+        <div class="tags">${c.tags.map(t=>`<span class="tag">✓ ${t}</span>`).join('')}</div>
+        <div class="chantier-actions">
+          <button class="btn btn-ghost btn-sm" onclick="openDetail('${c.id}')">Voir le détail</button>
+          <button class="btn btn-primary btn-sm" onclick="alert('Redirection vers le simulateur…')">Simuler</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  initFadeUp();
+}
+
+// AI SEARCH
+function fillQuery(el){ document.getElementById('aiQuery').value=el.textContent; }
+
+async function doAISearch(){
+  const query=document.getElementById('aiQuery').value.trim();
+  if(!query){alert('Entrez une description de votre logement.');return;}
+  const btn=document.getElementById('aiSearchBtn');
+  btn.disabled=true;
+  document.getElementById('aiLoading').style.display='flex';
+  document.getElementById('aiResult').style.display='none';
+  try{
+    const prompt=`Tu es assistant de recherche ClearRéno. L'utilisateur cherche : "${query}".
+Base de données : ${JSON.stringify(DB.map(c=>({id:c.id,type:c.type,ville:c.ville,surface:c.surface,annee:c.annee,chauffage:c.chauffage,eco_euros:c.eco_euros})))}
+Réponds UNIQUEMENT en JSON valide :
+{"interpretation":"ce que tu as compris en 1-2 phrases","criteres":["critère1","critère2","critère3"],"resultats":[{"id":"ch001","score":95,"raison":"pourquoi en 1 phrase"}]}
+Maximum 4 résultats. Score de 0 à 100.`;
+    const text=await window.claude.complete(prompt);
+    const data=JSON.parse(text);
+    document.getElementById('aiResultTitle').textContent=data.interpretation;
+    document.getElementById('aiResultText').textContent='';
+    document.getElementById('aiCriteres').innerHTML=data.criteres.map(c=>`<span class="badge badge-success">${c}</span>`).join('');
+    document.getElementById('aiResult').style.display='block';
+    const scores={};
+    data.resultats.forEach(r=>scores[r.id]=r.score);
+    const ordered=data.resultats.map(r=>DB.find(c=>c.id===r.id)).filter(Boolean);
+    renderGrid(ordered,scores);
+  } catch(e){
+    document.getElementById('aiResultTitle').textContent='Résultats basés sur votre description';
+    document.getElementById('aiResult').style.display='block';
+    renderGrid();
+  }
+  document.getElementById('aiLoading').style.display='none';
+  btn.disabled=false;
+}
+
+// SHOW MATCHING
+function showMatching(){
+  document.getElementById('matchingCard').style.display='block';
+  document.getElementById('matchingCard').scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+// DETAIL MODAL
+function openDetail(id){
+  const c=DB.find(x=>x.id===id);
+  if(!c)return;
+  currentChantier=c;
+  chatHistory=[];
+  document.getElementById('chatbotBtn').classList.add('modal-open');
+  document.getElementById('drawerTitle').textContent=`Assistant — ${c.label}`;
+  document.getElementById('drawerSub').textContent=`Je connais tous les détails de ce chantier à ${c.ville}.`;
+  document.getElementById('suggestedQs').innerHTML=['Est-ce que ça marche pour mon type de maison ?','Combien d\'aides puis-je obtenir ?','Combien de temps ça prend vraiment ?'].map(q=>`<button class="sug-q" onclick="askSugQuestion(this)">${q}</button>`).join('');
+  document.getElementById('chatMessages').innerHTML='<div class="chat-bubble bubble-assistant">Bonjour ! Je suis ici pour répondre à toutes vos questions sur ce chantier à '+c.ville+'. Que souhaitez-vous savoir ?</div>';
+
+  const totalAides=c.aides.maprimerenov+c.aides.cee+c.aides.locale;
+  document.getElementById('modalContent').innerHTML=`
+    <div style="padding:8px 8px 0;text-align:right"><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-hero" style="background:${c.gradient};margin:0 0 0">
+      <div style="text-align:center;z-index:1;position:relative">
+        <div style="font-size:56px;margin-bottom:12px">${c.type==='pac_aireau'?'♨️':c.type==='pac_airair'?'💨':c.type==='isolation'?'🧱':c.type==='vmc'?'🌀':'⭐'}</div>
+        <div style="font-family:var(--font-d);font-weight:700;font-size:28px;color:#fff">${c.label}</div>
+        <div style="color:rgba(255,255,255,.7);font-size:15px;margin-top:6px">📍 ${c.ville} (${c.dep}) · ${c.surface} m²</div>
+      </div>
+      <div class="modal-breadcrumb">Hub > ${c.type} > ${c.ville}</div>
+      <div class="modal-verified">✓ CHANTIER VÉRIFIÉ ADEME</div>
+    </div>
+    <div class="modal-content">
+      <div>
+        <div class="gallery">
+          <h3 class="chart-title">📷 Galerie chantier</h3>
+          <div class="gallery-slides">
+            ${['Avant','Pendant J+2','Après','Équipe'].map((l,i)=>`<div class="gallery-slide ${i===0?'active':''}" style="background:${c.gradient};filter:${i===0?'none':i===1?'brightness(.85)':i===2?'brightness(1.1)':'brightness(.7)'}">${['🏠','🔧','✅','👷'][i]}<br><span style="font-size:10px;color:rgba(255,255,255,.8);font-weight:700">${l}</span></div>`).join('')}
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <h3 class="chart-title">📊 Consommation avant / après</h3>
+          <svg id="modalChart" width="100%" height="200" viewBox="0 0 500 200"></svg>
+        </div>
+        <div class="ai-analysis" id="modalAiAnalysis">
+          <div class="ai-analysis-header"><span style="background:var(--accent);color:#fff;padding:4px 10px;border-radius:var(--r-badge);font-size:11px;font-weight:700">✨ Analyse IA</span><span style="font-size:14px;font-weight:600;color:var(--primary);margin-left:8px">Ce que ce chantier signifie pour vous</span></div>
+          <div id="aiAnalysisContent">${skeletonRows(4)}</div>
+        </div>
+        <div class="testimonial-block">
+          <div class="testimonial-quote">${c.temoignage}</div>
+          <div style="display:flex;align-items:center;gap:8px"><span class="badge badge-success">✓ Avis vérifié</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="sticky-card">
+          <span class="sticky-eco">−${c.eco_euros.toLocaleString('fr-FR')} €/an</span>
+          <div class="metrics-grid">
+            <div class="metric-item"><div class="metric-val">${c.invest_ht.toLocaleString('fr-FR')} €</div><div class="metric-label">Investissement HT</div></div>
+            <div class="metric-item"><div class="metric-val">${c.roi} ans</div><div class="metric-label">ROI</div></div>
+            <div class="metric-item"><div class="metric-val">${c.duree}</div><div class="metric-label">Durée chantier</div></div>
+            <div class="metric-item"><div class="metric-val" style="font-size:12px">${c.equipement}</div><div class="metric-label">Équipement</div></div>
+          </div>
+          <div style="height:1px;background:rgba(0,0,0,.08);margin:16px 0"></div>
+          <p style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">Aides mobilisées</p>
+          <ul class="aides-list">
+            <li><span>MaPrimeRénov'</span><span style="font-family:var(--font-m);color:var(--secondary)">${c.aides.maprimerenov.toLocaleString('fr-FR')} € ✓</span></li>
+            <li><span>CEE</span><span style="font-family:var(--font-m);color:var(--secondary)">${c.aides.cee.toLocaleString('fr-FR')} € ✓</span></li>
+            ${c.aides.locale?`<li><span>Aide locale</span><span style="font-family:var(--font-m);color:var(--secondary)">${c.aides.locale.toLocaleString('fr-FR')} € ✓</span></li>`:''}
+          </ul>
+          <div class="aide-total-box"><span>Total aides</span><span style="font-family:var(--font-m)">${totalAides.toLocaleString('fr-FR')} €</span></div>
+          <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px">
+            <button class="btn btn-primary btn-full btn-sm" onclick="alert('Redirection vers le simulateur…')">Simuler pour mon logement</button>
+            <button class="btn btn-ghost btn-full btn-sm">Contacter un expert</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('detailModal').classList.add('open');
+  document.body.style.overflow='hidden';
+  drawModalChart(c);
+  loadAIAnalysis(c);
+}
+
+function skeletonRows(n){return Array.from({length:n},(_,i)=>`<div class="skeleton" style="height:16px;margin-bottom:${i<n-1?'10px':'0'};width:${[90,75,85,60][i]}%"></div>`).join('')}
+
+function drawModalChart(c){
+  const svg=document.getElementById('modalChart');
+  if(!svg)return;
+  const W=500,H=180,pad=40;
+  const maxVal=Math.max(c.facture_avant,c.facture_apres)*1.1;
+  const bW=60;
+  const groups=[{label:'Avant',vals:[c.facture_avant,c.eco_kwh/100],colors:['#E63946','#CC4444']},{label:'Après',vals:[c.facture_apres,Math.round(c.eco_kwh/100*0.3)],colors:['#52B788','#2D8E5E']}];
+  let html='';
+  groups.forEach((g,gi)=>{
+    const x=pad+gi*(bW+20);
+    g.vals.forEach((v,vi)=>{
+      const bH=(v/maxVal)*(H-40);
+      const y=H-20-bH;
+      html+=`<rect x="${x+vi*(bW/2+4)}" y="${y}" width="${bW/2-2}" height="${bH}" fill="${g.colors[vi]}" rx="4"/>`;
+      html+=`<text x="${x+vi*(bW/2+4)+bW/4-1}" y="${y-4}" text-anchor="middle" font-size="10" fill="${g.colors[vi]}" font-family="JetBrains Mono,monospace">${v.toLocaleString('fr-FR')}</text>`;
+    });
+    html+=`<text x="${x+bW/2}" y="${H-4}" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="Satoshi,sans-serif">${g.label}</text>`;
+  });
+  html+=`<text x="4" y="12" font-size="9" fill="var(--muted)">€/an</text>`;
+  html+=`<text x="180" y="12" font-size="9" fill="var(--muted)">kWh/100</text>`;
+  svg.innerHTML=html;
+}
+
+async function loadAIAnalysis(c){
+  try{
+    const prompt=`Tu es conseiller rénovation énergétique ClearRéno. Analyse ce chantier pour aider un prospect.
+Données : ${JSON.stringify({label:c.label,ville:c.ville,surface:c.surface,annee:c.annee,chauffage:c.chauffage,eco_euros:c.eco_euros,invest_ht:c.invest_ht,roi:c.roi})}
+Réponds UNIQUEMENT en JSON valide :
+{"identification":"Ce chantier vous ressemble si... (1 phrase, critères concrets)","resultat_cle":"La phrase percutante sur l'économie principale","particularite":"Ce qui rend ce cas unique (1 phrase)","conseil":"1 conseil actionnable pour logement similaire"}`;
+    const text=await window.claude.complete(prompt);
+    const data=JSON.parse(text);
+    const el=document.getElementById('aiAnalysisContent');
+    if(!el)return;
+    el.innerHTML=[
+      {icon:'🏠',label:'Ce chantier vous ressemble si…',val:data.identification},
+      {icon:'💰',label:'Résultat clé',val:data.resultat_cle},
+      {icon:'⭐',label:'Ce qui est remarquable',val:data.particularite},
+      {icon:'💡',label:'Notre conseil',val:data.conseil}
+    ].map(i=>`<div class="ai-item"><span class="ai-item-icon">${i.icon}</span><div class="ai-item-content"><div class="ai-item-label">${i.label}</div>${i.val}</div></div>`).join('');
+  } catch(e){
+    const el=document.getElementById('aiAnalysisContent');
+    if(el)el.innerHTML='<p style="font-size:14px;color:var(--muted)">Analyse disponible lors de la consultation complète.</p>';
+  }
+}
+
+function closeModal(){
+  document.getElementById('detailModal').classList.remove('open');
+  document.body.style.overflow='';
+  document.getElementById('chatbotBtn').classList.remove('modal-open');
+  if(chatbotOpen)toggleChatbot();
+}
+
+// CHATBOT
+function toggleChatbot(){
+  chatbotOpen=!chatbotOpen;
+  document.getElementById('chatbotDrawer').classList.toggle('open',chatbotOpen);
+}
+
+async function sendChat(){
+  const input=document.getElementById('chatInput');
+  const msg=input.value.trim();
+  if(!msg)return;
+  input.value='';
+  addBubble(msg,'user');
+  const typing=addTyping();
+  try{
+    const prompt=`Tu es assistant expert rénovation énergétique ClearRéno. Tu réponds aux questions sur ce chantier : ${JSON.stringify(currentChantier?{label:currentChantier.label,ville:currentChantier.ville,eco_euros:currentChantier.eco_euros,invest_ht:currentChantier.invest_ht,certif:currentChantier.certif}:{})}.
+Règles : réponses max 3 phrases | français | chaleureux et professionnel. Question: ${msg}`;
+    const reply=await window.claude.complete(prompt);
+    typing.remove();
+    addBubble(reply,'assistant');
+  } catch(e){typing.remove();addBubble('Je suis là pour vous aider ! Posez-moi vos questions sur ce chantier.','assistant');}
+}
+
+function askSugQuestion(btn){
+  document.getElementById('chatInput').value=btn.textContent;
+  sendChat();
+}
+
+function addBubble(text,role){
+  const msgs=document.getElementById('chatMessages');
+  const div=document.createElement('div');
+  div.className=`chat-bubble bubble-${role}`;
+  div.textContent=text;
+  msgs.appendChild(div);
+  msgs.scrollTop=msgs.scrollHeight;
+  return div;
+}
+
+function addTyping(){
+  const msgs=document.getElementById('chatMessages');
+  const div=document.createElement('div');
+  div.className='typing-indicator';
+  div.innerHTML='<div class="dots"><span></span><span></span><span></span></div><span style="font-size:13px;color:var(--muted)">Réponse en cours…</span>';
+  msgs.appendChild(div);
+  msgs.scrollTop=msgs.scrollHeight;
+  return div;
+}
+
+// FADE UP
+function initFadeUp(){
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}});
+  },{threshold:.1});
+  document.querySelectorAll('.fade-up:not(.visible)').forEach(el=>obs.observe(el));
+}
+
+// AVIS GAUGE + BARS
+function initAvisSection(){
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const circ=document.getElementById('avisGauge');
+        if(circ){const circumference=2*Math.PI*80;circ.style.strokeDashoffset=circumference*(1-0.98);}
+        document.querySelectorAll('.theme-bar-fill').forEach(bar=>{
+          bar.style.width=bar.dataset.pct+'%';
+        });
+        obs.unobserve(e.target);
+      }
+    });
+  },{threshold:.3});
+  const avisSection=document.querySelector('.avis-section');
+  if(avisSection)obs.observe(avisSection);
+}
+
+// SCROLL NAV
+window.addEventListener('scroll',()=>{
+  document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>20);
+});
+
+// INIT
+document.addEventListener('DOMContentLoaded',()=>{
+  renderGrid();
+  initFadeUp();
+  initAvisSection();
+  // Check URL for from_simulator
+  if(window.location.search.includes('from_simulator'))showMatching();
+});
+</script>
+</body>
+</html>

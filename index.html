@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClearRéno — Tous les modules</title>
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&f[]=satoshi@400,600,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#1A3C2E;--secondary:#2D6A4F;--accent:#52B788;--bg:#F0FAF4;--surface:#FAFAFA;--dark:#0F1F17;--text:#1A1A1A;--muted:#666666;--success:#D8F3DC;--font-d:'Clash Display',sans-serif;--font-b:'Satoshi',sans-serif;--font-m:'JetBrains Mono',monospace}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-b);color:var(--text);background:var(--dark);min-height:100vh;overflow-x:hidden}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#0F1F17 0%,#1A3C2E 50%,#2D6A4F 100%);padding:80px 24px 64px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E");pointer-events:none}
+.logo{font-family:var(--font-d);font-weight:700;font-size:36px;color:#fff;margin-bottom:8px}
+.logo-sub{font-size:14px;color:rgba(255,255,255,.5);margin-bottom:48px;letter-spacing:.04em}
+.hero-title{font-family:var(--font-d);font-weight:700;font-size:clamp(32px,5vw,56px);color:#fff;line-height:1.1;margin-bottom:16px}
+.hero-title span{color:var(--accent)}
+.hero-sub{font-size:18px;color:rgba(255,255,255,.65);max-width:560px;margin:0 auto 56px;line-height:1.6}
+
+/* SPA DEMO LINK */
+.spa-banner{background:rgba(82,183,136,.12);border:1px solid rgba(82,183,136,.3);border-radius:16px;padding:24px 32px;max-width:720px;margin:0 auto 48px;display:flex;align-items:center;gap:20px;text-align:left}
+.spa-banner-icon{font-size:36px;flex-shrink:0}
+.spa-banner-title{font-family:var(--font-d);font-weight:700;font-size:18px;color:#fff;margin-bottom:4px}
+.spa-banner-sub{font-size:14px;color:rgba(255,255,255,.6)}
+.spa-banner .btn{flex-shrink:0;margin-left:auto}
+
+/* MODULES GRID */
+.modules-section{padding:64px 24px;max-width:1200px;margin:0 auto}
+.section-label{font-size:12px;font-weight:700;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.1em;margin-bottom:24px}
+.modules-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media(max-width:1024px){.modules-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){.modules-grid{grid-template-columns:1fr}.spa-banner{flex-direction:column}.spa-banner .btn{width:100%;justify-content:center}}
+
+/* MODULE CARD */
+.module-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;overflow:hidden;transition:all .25s ease-out;cursor:pointer;text-decoration:none;display:flex;flex-direction:column}
+.module-card:hover{background:rgba(255,255,255,.07);border-color:rgba(82,183,136,.35);transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,.4)}
+.module-card-visual{height:180px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.module-card-icon{font-size:56px;position:relative;z-index:1;filter:drop-shadow(0 4px 12px rgba(0,0,0,.3))}
+.module-card-num{position:absolute;top:12px;left:12px;font-family:var(--font-m);font-size:11px;font-weight:700;color:rgba(255,255,255,.5);background:rgba(0,0,0,.3);padding:3px 8px;border-radius:100px;backdrop-filter:blur(4px)}
+.module-card-badge{position:absolute;top:12px;right:12px;padding:3px 8px;border-radius:100px;font-size:11px;font-weight:700}
+.badge-new{background:var(--accent);color:#fff}
+.badge-beta{background:#FF6B35;color:#fff}
+.badge-ai{background:rgba(139,92,246,.8);color:#fff}
+.module-card-body{padding:24px;flex:1;display:flex;flex-direction:column}
+.module-card-title{font-family:var(--font-d);font-weight:700;font-size:20px;color:#fff;margin-bottom:8px}
+.module-card-desc{font-size:14px;color:rgba(255,255,255,.55);line-height:1.6;margin-bottom:20px;flex:1}
+.module-card-features{list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:20px}
+.module-card-features li{font-size:12px;color:rgba(255,255,255,.45);display:flex;align-items:center;gap:6px}
+.module-card-features li::before{content:'→';color:var(--accent);flex-shrink:0}
+.module-card-footer{border-top:1px solid rgba(255,255,255,.07);padding-top:16px;display:flex;align-items:center;justify-content:space-between}
+.module-card-tech{font-size:11px;color:rgba(255,255,255,.3);font-family:var(--font-m)}
+.module-card-cta{font-size:13px;font-weight:700;color:var(--accent);display:flex;align-items:center;gap:6px;transition:gap .2s}
+.module-card:hover .module-card-cta{gap:10px}
+
+/* FEATURES SECTION */
+.features-section{padding:48px 24px 64px;max-width:1200px;margin:0 auto}
+.features-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media(max-width:768px){.features-grid{grid-template-columns:repeat(2,1fr)}}
+.feature-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:20px;text-align:center}
+.feature-icon{font-size:28px;margin-bottom:10px;display:block}
+.feature-title{font-family:var(--font-d);font-weight:700;font-size:14px;color:#fff;margin-bottom:6px}
+.feature-desc{font-size:12px;color:rgba(255,255,255,.4);line-height:1.5}
+
+/* TECH STACK */
+.tech-section{padding:0 24px 64px;max-width:1200px;margin:0 auto}
+.tech-row{display:flex;flex-wrap:wrap;gap:10px}
+.tech-pill{padding:6px 14px;border-radius:100px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);font-size:12px;font-weight:600;color:rgba(255,255,255,.6);font-family:var(--font-m)}
+
+/* FOOTER */
+.footer-bar{border-top:1px solid rgba(255,255,255,.06);padding:24px;text-align:center;font-size:12px;color:rgba(255,255,255,.25)}
+
+/* BTN */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:8px;font-family:var(--font-b);font-size:14px;font-weight:700;cursor:pointer;border:none;text-decoration:none;transition:all .2s;white-space:nowrap}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(82,183,136,.4)}
+.btn-secondary{background:transparent;color:var(--accent);border:2px solid var(--accent)}.btn-secondary:hover{transform:translateY(-1px)}
+.btn-sm{padding:8px 16px;font-size:13px}
+
+/* FADE IN */
+.fade-in{opacity:0;transform:translateY(20px);transition:opacity .6s ease-out,transform .6s ease-out}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div style="position:relative;z-index:1">
+    <div class="logo">ClearRéno</div>
+    <div class="logo-sub">Par EcoTech Solutions — Mai 2026</div>
+    <h1 class="hero-title">Plateforme de<br><span>rénovation énergétique</span></h1>
+    <p class="hero-sub">6 modules interactifs. IA intégrée. Données ADEME vérifiées. Une démonstration complète d'un produit digital de niveau production.</p>
+
+    <!-- SPA Demo -->
+    <div class="spa-banner">
+      <div class="spa-banner-icon">⚡</div>
+      <div>
+        <div class="spa-banner-title">Démo SPA complète — 5 vues en un fichier</div>
+        <div class="spa-banner-sub">Landing · Hub de preuves · Simulateur · Dashboard · Score carbone — navigation SPA vanilla JS</div>
+      </div>
+      <a href="ClearReno.html" class="btn btn-primary">Voir la démo →</a>
+    </div>
+  </div>
+</div>
+
+<!-- MODULES -->
+<div class="modules-section">
+  <div class="section-label">Modules indépendants — Chaque fichier est autonome</div>
+  <div class="modules-grid">
+
+    <!-- M1 Hub -->
+    <a href="module1-hub-preuves.html" class="module-card fade-in">
+      <div class="module-card-visual" style="background:linear-gradient(135deg,#0F1F17,#1A3C2E,#2D6A4F)">
+        <span class="module-card-icon">🛡️</span>
+        <span class="module-card-num">Module 1</span>
+        <span class="module-card-badge badge-ai">IA</span>
+      </div>
+      <div class="module-card-body">
+        <div class="module-card-title">Hub de Preuves Sociales</div>
+        <div class="module-card-desc">12 chantiers documentés avec recherche sémantique IA, modal de détail complet, chatbot contextuel et analyse d'avis automatisée.</div>
+        <ul class="module-card-features">
+          <li>Recherche sémantique par description libre</li>
+          <li>Filtres avancés + tri dynamique</li>
+          <li>Modal détail avec chatbot IA par chantier</li>
+          <li>Analyse thématique de 6 240 avis</li>
+          <li>Matching personnalisé depuis simulateur</li>
+        </ul>
+        <div class="module-card-footer">
+          <span class="module-card-tech">claude.complete() × 3</span>
+          <span class="module-card-cta">Ouvrir →</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- M2 Simulateur -->
+    <a href="module2-simulateur.html" class="module-card fade-in" style="transition-delay:.1s">
+      <div class="module-card-visual" style="background:linear-gradient(135deg,#1A3C2E,#2D6A4F,#52B788)">
+        <span class="module-card-icon">🧮</span>
+        <span class="module-card-num">Module 2</span>
+        <span class="module-card-badge badge-ai">IA</span>
+      </div>
+      <div class="module-card-body">
+        <div class="module-card-title">Simulateur IA Personnalisé</div>
+        <div class="module-card-desc">Formulaire 4 étapes avec calcul dynamique des économies, aides 2026 réelles, recommandation IA personnalisée et graphique SVG animé.</div>
+        <ul class="module-card-features">
+          <li>Calcul temps réel à chaque saisie</li>
+          <li>Moteur de calcul aides 2026 (MPR, CEE, PTZ)</li>
+          <li>Recommandation IA selon profil chauffage</li>
+          <li>Graphique cumul économies 10 ans (SVG pur)</li>
+          <li>Sauvegarde localStorage + export PDF</li>
+        </ul>
+        <div class="module-card-footer">
+          <span class="module-card-tech">claude.complete() × 1</span>
+          <span class="module-card-cta">Ouvrir →</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- M3 Suivi -->
+    <a href="module3-suivi-chantier.html" class="module-card fade-in" style="transition-delay:.2s">
+      <div class="module-card-visual" style="background:linear-gradient(135deg,#2D6A4F,#40916C,#74C69D)">
+        <span class="module-card-icon">📊</span>
+        <span class="module-card-num">Module 3</span>
+        <span class="module-card-badge badge-new">CLIENT</span>
+      </div>
+      <div class="module-card-body">
+        <div class="module-card-title">Suivi de Chantier</div>
+        <div class="module-card-desc">Dashboard client complet avec timeline interactive 7 étapes, messagerie IA simulant Marc Durand, bibliothèque pédagogique et gestion de documents.</div>
+        <ul class="module-card-features">
+          <li>Timeline accordéon avec photos de chantier</li>
+          <li>Messagerie IA (répond comme le chef de projet)</li>
+          <li>Bibliothèque PAC avec Q&A IA intégré</li>
+          <li>Gestion documentaire avec filtres</li>
+          <li>Chatbot contextuel par étape de chantier</li>
+        </ul>
+        <div class="module-card-footer">
+          <span class="module-card-tech">claude.complete() × 3</span>
+          <span class="module-card-cta">Ouvrir →</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- M4 Gamification -->
+    <a href="module4-gamification.html" class="module-card fade-in" style="transition-delay:.3s">
+      <div class="module-card-visual" style="background:linear-gradient(135deg,#0F1F17,#1A3C2E,#52B788)">
+        <span class="module-card-icon">🌿</span>
+        <span class="module-card-num">Module 4</span>
+        <span class="module-card-badge badge-ai">IA</span>
+      </div>
+      <div class="module-card-body">
+        <div class="module-card-title">Gamification & Score Carbone</div>
+        <div class="module-card-desc">Bilan carbone personnalisé, programme de points interactif, générateur de posts IA par réseau social, badges et récompenses.</div>
+        <ul class="module-card-features">
+          <li>Jauge CO2 SVG animée stroke-dashoffset</li>
+          <li>Graphique barres mensuel tracé JS pur</li>
+          <li>Analyse IA de l'impact environnemental</li>
+          <li>Système de points avec déduction live</li>
+          <li>Générateur de posts LinkedIn/Twitter/WhatsApp</li>
+        </ul>
+        <div class="module-card-footer">
+          <span class="module-card-tech">claude.complete() × 2</span>
+          <span class="module-card-cta">Ouvrir →</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- M5 Jumeau -->
+    <a href="module5-jumeau-3d.html" class="module-card fade-in" style="transition-delay:.4s">
+      <div class="module-card-visual" style="background:linear-gradient(135deg,#0A1628,#1A2B4A,#2D4A7A)">
+        <span class="module-card-icon">🏗️</span>
+        <span class="module-card-num">Module 5</span>
+        <span class="module-card-badge badge-beta">BÊTA</span>
+      </div>
+      <div class="module-card-body">
+        <div class="module-card-title">Jumeau Numérique 3D</div>
+        <div class="module-card-desc">Visualisation 3D CSS d'une maison rénovée, avant/après slider, carte thermique, personnalisation live des couleurs et analyse architecturale IA.</div>
+        <ul class="module-card-features">
+          <li>Maison 3D interactive en CSS pur (sans Three.js)</li>
+          <li>Slider avant/après par clip-path JS</li>
+          <li>Upload photos avec aperçu FileReader</li>
+          <li>Personnalisation couleurs en temps réel</li>
+          <li>Analyse architecturale et thermique IA</li>
+        </ul>
+        <div class="module-card-footer">
+          <span class="module-card-tech">claude.complete() × 1</span>
+          <span class="module-card-cta">Ouvrir →</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- SPA Card -->
+    <a href="ClearReno.html" class="module-card fade-in" style="transition-delay:.5s;border-color:rgba(82,183,136,.2)">
+      <div class="module-card-visual" style="background:linear-gradient(135deg,#52B788,#1A3C2E)">
+        <span class="module-card-icon">⚡</span>
+        <span class="module-card-num">SPA</span>
+        <span class="module-card-badge badge-new">COMPLET</span>
+      </div>
+      <div class="module-card-body">
+        <div class="module-card-title">Démo SPA Complète</div>
+        <div class="module-card-desc">Les 5 vues en un seul fichier HTML. Navigation SPA vanilla JS, toutes les animations, compteurs animés et simulateur fonctionnel. 100% vanilla.</div>
+        <ul class="module-card-features">
+          <li>100% vanilla JS — zéro dépendance externe</li>
+          <li>Navigation SPA fade + translateY</li>
+          <li>Simulateur avec calcul dynamique complet</li>
+          <li>Dashboard Thomas Renard — chantier réel</li>
+          <li>Score carbone + gamification intégrés</li>
+        </ul>
+        <div class="module-card-footer">
+          <span class="module-card-tech">Vanilla JS only</span>
+          <span class="module-card-cta" style="color:#fff">Ouvrir →</span>
+        </div>
+      </div>
+    </a>
+
+  </div>
+</div>
+
+<!-- FEATURES -->
+<div class="features-section">
+  <div class="section-label" style="margin-bottom:24px">Caractéristiques techniques</div>
+  <div class="features-grid">
+    <div class="feature-card fade-in"><span class="feature-icon">🤖</span><div class="feature-title">IA Intégrée</div><div class="feature-desc">window.claude.complete() — Recommandations, chatbots, analyses et générateurs de contenu personnalisés</div></div>
+    <div class="feature-card fade-in" style="transition-delay:.1s"><span class="feature-icon">📊</span><div class="feature-title">Graphiques SVG Purs</div><div class="feature-desc">Tous les graphiques tracés en JS vanilla — courbes économies, barres CO2, jauges animées stroke-dashoffset</div></div>
+    <div class="feature-card fade-in" style="transition-delay:.2s"><span class="feature-icon">📱</span><div class="feature-title">Responsive Mobile</div><div class="feature-desc">Breakpoints 768px et 1024px — Grilles adaptatives, navigation hamburger, touch events</div></div>
+    <div class="feature-card fade-in" style="transition-delay:.3s"><span class="feature-icon">🎨</span><div class="feature-title">Design System Cohérent</div><div class="feature-desc">CSS variables, Clash Display + Satoshi + JetBrains Mono, 8px grid, animations 350ms ease-in-out</div></div>
+    <div class="feature-card fade-in" style="transition-delay:.4s"><span class="feature-icon">⚡</span><div class="feature-title">Skeleton Screens</div><div class="feature-desc">Aucun spinner — états de chargement shimmer animés pendant tous les appels IA</div></div>
+    <div class="feature-card fade-in" style="transition-delay:.5s"><span class="feature-icon">💾</span><div class="feature-title">localStorage Persist.</div><div class="feature-desc">Simulateur sauvegardé entre les sessions — données de formulaire restaurées automatiquement</div></div>
+    <div class="feature-card fade-in" style="transition-delay:.6s"><span class="feature-icon">🖨️</span><div class="feature-title">Export PDF</div><div class="feature-desc">@media print dédié sur le simulateur et les rapports — window.print() optimisé pour l'impression</div></div>
+    <div class="feature-card fade-in" style="transition-delay:.7s"><span class="feature-icon">♿</span><div class="feature-title">Données Réalistes</div><div class="feature-desc">Zéro lorem ipsum — Thomas Renard, Marc Durand, PAC Daikin 11kW, chiffres ADEME cohérents</div></div>
+  </div>
+</div>
+
+<!-- TECH STACK -->
+<div class="tech-section">
+  <div class="section-label" style="margin-bottom:16px">Stack technique</div>
+  <div class="tech-row">
+    <span class="tech-pill">HTML5 sémantique</span>
+    <span class="tech-pill">CSS3 Variables</span>
+    <span class="tech-pill">Vanilla JS ES6+</span>
+    <span class="tech-pill">SVG dynamique</span>
+    <span class="tech-pill">IntersectionObserver</span>
+    <span class="tech-pill">requestAnimationFrame</span>
+    <span class="tech-pill">localStorage</span>
+    <span class="tech-pill">CSS 3D transforms</span>
+    <span class="tech-pill">clip-path animation</span>
+    <span class="tech-pill">stroke-dashoffset</span>
+    <span class="tech-pill">window.claude.complete()</span>
+    <span class="tech-pill">Clash Display</span>
+    <span class="tech-pill">Satoshi</span>
+    <span class="tech-pill">JetBrains Mono</span>
+    <span class="tech-pill">@media print</span>
+    <span class="tech-pill">FileReader API</span>
+    <span class="tech-pill">navigator.clipboard</span>
+    <span class="tech-pill">CSS perspective()</span>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer-bar">
+  <p>© 2026 EcoTech Solutions — ClearRéno v1.0 — Démo réalisée avec Claude</p>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}});
+  },{threshold:.1});
+  document.querySelectorAll('.fade-in').forEach(el=>obs.observe(el));
+});
+</script>
+</body>
+</html>

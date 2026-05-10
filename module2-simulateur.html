@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClearRéno — Simulateur IA Personnalisé</title>
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&f[]=satoshi@400,600,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#1A3C2E;--secondary:#2D6A4F;--accent:#52B788;--bg:#F0FAF4;--surface:#FAFAFA;--dark:#0F1F17;--text:#1A1A1A;--muted:#666666;--success:#D8F3DC;--error:#FFDDD2;--font-d:'Clash Display',sans-serif;--font-b:'Satoshi',sans-serif;--font-m:'JetBrains Mono',monospace;--r-card:12px;--r-badge:100px;--r-btn:8px;--shadow:0 2px 8px rgba(0,0,0,.06);--shadow-lg:0 8px 24px rgba(0,0,0,.12)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-b);font-size:16px;color:var(--text);background:var(--bg);overflow-x:hidden}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-bottom:1px solid rgba(0,0,0,.06);height:72px;display:flex;align-items:center}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;width:100%;display:flex;align-items:center;gap:32px}
+.nav-logo-name{font-family:var(--font-d);font-weight:700;font-size:22px;color:var(--primary)}
+.nav-logo-sub{font-size:10px;color:var(--muted)}
+.nav-menu{display:flex;list-style:none;gap:4px;flex:1}
+.nav-menu a{font-size:14px;font-weight:600;color:var(--muted);text-decoration:none;padding:8px 12px;border-radius:6px;cursor:pointer;transition:color .2s}
+.nav-menu a:hover{color:var(--primary)}
+.nav-menu li.active a{color:var(--accent)}
+
+/* BTNS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 28px;border-radius:var(--r-btn);font-family:var(--font-b);font-size:15px;font-weight:700;cursor:pointer;border:none;text-decoration:none;transition:transform .2s ease-out,box-shadow .2s ease-out;white-space:nowrap}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(82,183,136,.4)}
+.btn-secondary{background:transparent;color:var(--accent);border:2px solid var(--accent)}.btn-secondary:hover{transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:var(--secondary);padding:10px 16px}.btn-ghost:hover{text-decoration:underline}
+.btn-sm{padding:8px 16px;font-size:13px}
+.btn-full{width:100%}
+.btn-white{background:#fff;color:var(--primary)}.btn-white:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.1)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
+
+/* FORMS */
+.form-input{height:48px;border:1px solid #DDD;border-radius:var(--r-btn);padding:0 16px;font-family:var(--font-b);font-size:15px;background:#fff;color:var(--text);outline:none;width:100%;transition:border .2s,box-shadow .2s}
+.form-input:focus{border:2px solid var(--accent);box-shadow:0 0 0 3px rgba(82,183,136,.2)}
+.form-textarea{border:1px solid #DDD;border-radius:var(--r-btn);padding:12px 16px;font-family:var(--font-b);font-size:15px;background:#fff;color:var(--text);outline:none;width:100%;resize:vertical;min-height:80px;transition:border .2s,box-shadow .2s}
+.form-textarea:focus{border:2px solid var(--accent);box-shadow:0 0 0 3px rgba(82,183,136,.2)}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:var(--r-badge);font-size:12px;font-weight:600}
+.badge-success{background:var(--success);color:var(--primary)}
+.badge-ai{background:var(--primary);color:var(--accent)}
+
+/* LAYOUT */
+.container{max-width:720px;margin:0 auto;padding:0 24px}
+.container-wide{max-width:900px;margin:0 auto;padding:0 24px}
+
+/* ENTRY */
+.entry-page{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:120px 24px 48px;text-align:center;background:var(--bg)}
+.entry-page.hidden{display:none}
+.entry-pill{background:var(--success);color:var(--secondary);padding:8px 16px;border-radius:var(--r-badge);font-size:13px;font-weight:700;margin-bottom:24px;display:inline-flex;align-items:center;gap:6px}
+.entry-title{font-family:var(--font-d);font-weight:700;font-size:clamp(36px,5vw,56px);color:var(--primary);line-height:1.1;margin-bottom:16px}
+.entry-sub{font-size:18px;color:var(--muted);margin-bottom:32px}
+.reassurances{display:flex;flex-wrap:wrap;justify-content:center;gap:16px;margin-bottom:40px}
+.reassurance-item{font-size:14px;color:var(--text);display:flex;align-items:center;gap:6px}
+
+/* PROGRESS BAR */
+.progress-bar-outer{position:sticky;top:72px;z-index:100;background:#fff;border-bottom:1px solid rgba(0,0,0,.06);padding:16px 0}
+.sim-steps{display:flex;max-width:720px;margin:0 auto;padding:0 24px}
+.sim-step{flex:1;display:flex;flex-direction:column;align-items:center;position:relative;cursor:pointer}
+.sim-step::after{content:'';position:absolute;top:16px;left:50%;right:-50%;height:2px;background:#EEE;z-index:-1}
+.sim-step:last-child::after{display:none}
+.step-circle{width:32px;height:32px;border-radius:50%;border:2px solid #DDD;background:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-weight:700;font-size:13px;color:var(--muted);margin-bottom:6px;transition:all .3s;position:relative;z-index:1}
+.sim-step.active .step-circle{background:var(--accent);border-color:var(--accent);color:#fff}
+.sim-step.done .step-circle{background:var(--secondary);border-color:var(--secondary);color:#fff}
+.sim-step.done::after{background:var(--secondary)}
+.sim-step.active::after{background:linear-gradient(90deg,var(--secondary),var(--accent))}
+.step-label{font-size:11px;font-weight:600;color:var(--muted);text-align:center}
+.sim-step.active .step-label,.sim-step.done .step-label{color:var(--primary)}
+
+/* PANELS */
+.sim-panel{display:none;padding:48px 0 80px;min-height:calc(100vh - 144px)}
+.sim-panel.active{display:block;animation:fadeIn .3s ease-out}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.panel-tag{display:inline-flex;align-items:center;padding:6px 14px;border-radius:var(--r-badge);background:var(--success);color:var(--secondary);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px}
+.panel-title{font-family:var(--font-d);font-weight:600;font-size:28px;color:var(--primary);margin-bottom:8px}
+.panel-sub{font-size:16px;color:var(--muted);margin-bottom:40px}
+
+/* TYPE CARDS */
+.type-cards{display:grid;gap:16px;margin-bottom:32px}
+.type-cards-3{grid-template-columns:repeat(3,1fr)}
+.type-cards-5{grid-template-columns:repeat(5,1fr)}
+.type-card{border:2px solid #DDD;border-radius:var(--r-card);padding:24px 16px;text-align:center;cursor:pointer;transition:all .2s;background:#fff;position:relative}
+.type-card:hover{border-color:var(--accent)}
+.type-card.selected{border-color:var(--accent);background:var(--bg)}
+.type-card.selected::after{content:'✓';position:absolute;top:8px;right:8px;width:20px;height:20px;background:var(--accent);color:#fff;border-radius:50%;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;line-height:20px}
+.type-icon{font-size:36px;display:block;margin-bottom:10px}
+.type-label{font-family:var(--font-d);font-weight:600;font-size:15px;color:var(--text)}
+.type-sub{font-size:12px;color:var(--muted);margin-top:4px}
+.type-sub-eco{font-size:11px;color:var(--secondary);margin-top:6px;font-weight:600}
+
+/* RADIO */
+.radio-group{display:flex;gap:12px;flex-wrap:wrap}
+.radio-btn{flex:1;min-width:120px;padding:12px 16px;border:2px solid #DDD;border-radius:8px;text-align:center;cursor:pointer;font-weight:600;font-size:14px;transition:all .2s;background:#fff;display:flex;align-items:center;justify-content:center;gap:8px}
+.radio-btn:hover{border-color:var(--accent)}
+.radio-btn.selected{border-color:var(--accent);background:var(--success);color:var(--primary)}
+
+/* SLIDER */
+.slider-wrap{margin:8px 0}
+.slider-input{width:100%;height:6px;appearance:none;border-radius:3px;outline:none;cursor:pointer;background:linear-gradient(to right,var(--accent) var(--pct,20%),#DDD var(--pct,20%))}
+.slider-input::-webkit-slider-thumb{appearance:none;width:22px;height:22px;border-radius:50%;background:var(--accent);border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.15);cursor:pointer}
+.slider-display{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.slider-val{font-family:var(--font-m);font-size:22px;font-weight:700;color:var(--primary)}
+.slider-hint{font-size:12px;color:var(--muted);margin-top:6px}
+
+/* YEAR BTNS */
+.year-btns{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.year-btn{padding:12px;border:2px solid #DDD;border-radius:8px;text-align:center;cursor:pointer;font-size:13px;font-weight:600;transition:all .2s;background:#fff}
+.year-btn:hover{border-color:var(--accent)}
+.year-btn.selected{border-color:var(--accent);background:var(--accent);color:#fff}
+.year-hint{font-size:12px;color:var(--secondary);margin-top:8px;padding:8px 12px;background:var(--bg);border-radius:6px;display:none}
+.year-hint.show{display:block}
+
+/* DPE */
+.dpe-btns{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+.dpe-btn{padding:12px 6px;border-radius:8px;text-align:center;cursor:pointer;font-weight:700;font-size:16px;border:2px solid transparent;transition:all .2s;opacity:.7}
+.dpe-btn:hover,.dpe-btn.selected{opacity:1;border-color:rgba(0,0,0,.2);box-shadow:0 4px 12px rgba(0,0,0,.15);transform:scale(1.05)}
+
+/* WORK CARDS */
+.work-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:32px}
+.work-card{border:2px solid #DDD;border-radius:var(--r-card);padding:20px;cursor:pointer;transition:all .2s;background:#fff;position:relative}
+.work-card:hover{border-color:var(--accent)}
+.work-card.selected{border-color:var(--accent);background:var(--bg)}
+.work-card.selected::after{content:'✓';position:absolute;top:8px;right:8px;width:20px;height:20px;background:var(--accent);color:#fff;border-radius:50%;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;line-height:20px}
+.work-icon{font-size:28px;display:block;margin-bottom:8px}
+.work-label{font-weight:700;font-size:14px;margin-bottom:4px}
+.work-eco{font-size:12px;color:var(--secondary);font-weight:600;margin-bottom:4px}
+.work-badge{background:var(--accent);color:#fff;padding:2px 6px;border-radius:var(--r-badge);font-size:10px;font-weight:700}
+.recommend-badge{background:var(--accent);color:#fff;padding:3px 8px;border-radius:var(--r-badge);font-size:11px;font-weight:700;position:absolute;top:-8px;left:50%;transform:translateX(-50%)}
+
+/* ESTIMATE CARD */
+.estimate-card{background:#FFF3CD;border:1px solid #FBBA00;border-radius:var(--r-card);padding:20px;margin-top:24px;display:none}
+.estimate-card.show{display:block}
+
+/* LIVE COUNTER */
+.live-counter{background:linear-gradient(135deg,var(--primary),var(--secondary));border-radius:var(--r-card);padding:24px;color:#fff;margin-bottom:24px;transition:all .3s}
+.live-counter-val{font-family:var(--font-m);font-size:36px;font-weight:700;color:var(--accent);display:block;line-height:1}
+.live-counter-label{font-size:13px;color:rgba(255,255,255,.7);margin-top:4px}
+
+/* INFO BOX */
+.info-box{border-radius:8px;padding:14px 16px;font-size:13px;display:flex;align-items:flex-start;gap:10px;margin-top:12px}
+.info-yellow{background:#FFF3CD;border:1px solid #FBBA00;color:#856404}
+.info-green{background:var(--success);border:1px solid rgba(82,183,136,.3);color:var(--primary)}
+
+/* RESULTS */
+.results-hero{background:var(--primary);color:#fff;border-radius:20px;padding:48px;text-align:center;margin-bottom:32px}
+.results-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px}
+.kpi-card{background:#fff;border-radius:var(--r-card);padding:24px;box-shadow:var(--shadow);text-align:center;border:1px solid rgba(0,0,0,.04)}
+.kpi-val{font-family:var(--font-m);font-size:28px;font-weight:700;color:var(--primary)}
+.kpi-label{font-size:13px;color:var(--muted);margin-top:6px}
+.kpi-sub{font-size:12px;color:var(--secondary);margin-top:4px;font-weight:600}
+.chart-card{background:#fff;border-radius:var(--r-card);padding:28px;box-shadow:var(--shadow);margin-bottom:24px}
+.chart-title{font-family:var(--font-d);font-weight:600;font-size:18px;color:var(--primary);margin-bottom:20px}
+.ai-reco{background:var(--bg);border-left:4px solid var(--accent);border-radius:12px;padding:28px;margin-bottom:24px}
+.aides-card{background:#fff;border-radius:var(--r-card);padding:28px;box-shadow:var(--shadow);margin-bottom:24px}
+.aide-row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(0,0,0,.06);font-size:14px}
+.aide-row:last-child{border:none}
+.aide-total{display:flex;justify-content:space-between;background:var(--success);border-radius:8px;padding:16px;margin-top:12px;font-weight:700;color:var(--primary)}
+.similar-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+.similar-card{background:#fff;border-radius:var(--r-card);padding:16px;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,.04)}
+.similar-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px);transition:.2s}
+
+/* SKELETON */
+.skeleton{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px}
+@keyframes shimmer{from{background-position:200% 0}to{background-position:-200% 0}}
+
+/* LOADING SCREEN */
+.loading-screen{display:none;flex-direction:column;align-items:center;justify-content:center;padding:80px 24px;text-align:center;min-height:60vh}
+.loading-screen.active{display:flex}
+.loading-progress{width:100%;max-width:400px;height:6px;background:#EEE;border-radius:100px;overflow:hidden;margin:24px 0}
+.loading-progress-fill{height:100%;background:var(--accent);border-radius:100px;transition:width .3s}
+.loading-text{font-size:16px;color:var(--muted);min-height:24px;transition:all .3s}
+
+/* MODAL CONTACT */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.5);align-items:center;justify-content:center;padding:24px}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:20px;box-shadow:var(--shadow-lg);max-width:460px;width:100%;padding:32px;text-align:center}
+.modal-icon{font-size:48px;margin-bottom:16px}
+.modal-title{font-family:var(--font-d);font-weight:700;font-size:24px;color:var(--primary);margin-bottom:8px}
+
+/* PRINT */
+@media print{nav,.progress-bar-outer,.sim-nav-btns,.cta-btns{display:none!important}.sim-panel.active{padding-top:0}}
+
+/* RESPONSIVE */
+@media(max-width:768px){.type-cards-3,.type-cards-5,.work-cards{grid-template-columns:repeat(2,1fr)}.dpe-btns{grid-template-columns:repeat(4,1fr)}.year-btns{grid-template-columns:repeat(2,1fr)}.results-kpis{grid-template-columns:1fr}.similar-cards{grid-template-columns:1fr}.nav-menu{display:none}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div><div class="nav-logo-name">ClearRéno</div><div class="nav-logo-sub">par EcoTech Solutions</div></div>
+    <ul class="nav-menu">
+      <li><a>Hub de preuves</a></li>
+      <li class="active"><a>Simulateur</a></li>
+      <li><a>Espace client</a></li>
+      <li><a>Mon impact</a></li>
+    </ul>
+    <button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="resetSim()">Recommencer</button>
+  </div>
+</nav>
+
+<!-- ENTRY PAGE -->
+<div class="entry-page" id="entryPage">
+  <div class="entry-pill">🤖 Moteur IA — Données ADEME 2026</div>
+  <h1 class="entry-title">Combien pouvez-vous<br>économiser ?</h1>
+  <p class="entry-sub">Simulation gratuite en 3 minutes — sans engagement</p>
+  <div class="reassurances">
+    <div class="reassurance-item">✓ Aucun démarchage sans votre accord</div>
+    <div class="reassurance-item">✓ Données ADEME 2026 en temps réel</div>
+    <div class="reassurance-item">✓ Estimation vérifiée sur 847 chantiers</div>
+  </div>
+  <button class="btn btn-primary" style="font-size:17px;padding:18px 48px" onclick="startSim()">Démarrer ma simulation →</button>
+</div>
+
+<!-- SIM WRAPPER -->
+<div id="simWrapper" style="display:none">
+  <!-- PROGRESS -->
+  <div class="progress-bar-outer">
+    <div class="sim-steps">
+      <div class="sim-step active" data-s="1"><div class="step-circle">1</div><div class="step-label">Votre logement</div></div>
+      <div class="sim-step" data-s="2"><div class="step-circle">2</div><div class="step-label">Énergie actuelle</div></div>
+      <div class="sim-step" data-s="3"><div class="step-circle">3</div><div class="step-label">Travaux</div></div>
+      <div class="sim-step" data-s="4"><div class="step-circle">4</div><div class="step-label">Contact</div></div>
+    </div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="sim-panel active" id="panel1">
+    <div class="container">
+      <div class="panel-tag">Étape 1 / 4</div>
+      <h2 class="panel-title">Parlez-nous de votre logement</h2>
+      <p class="panel-sub">Ces informations permettent de calculer vos économies précisément</p>
+
+      <div style="margin-bottom:32px">
+        <p style="font-weight:700;font-size:14px;margin-bottom:16px">Type de logement</p>
+        <div class="type-cards type-cards-3" id="logTypeCards">
+          <div class="type-card selected" data-val="maison" onclick="selectTypeCard(this,'logType')"><span class="type-icon">🏠</span><span class="type-label">Maison individuelle</span><span class="type-sub">Maison, villa, pavillon</span></div>
+          <div class="type-card" data-val="appartement" onclick="selectTypeCard(this,'logType')"><span class="type-icon">🏢</span><span class="type-label">Appartement</span><span class="type-sub">En immeuble collectif</span></div>
+          <div class="type-card" data-val="pro" onclick="selectTypeCard(this,'logType')"><span class="type-icon">🏭</span><span class="type-label">Local professionnel</span><span class="type-sub">Bureau, commerce</span></div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:32px">
+        <p style="font-weight:700;font-size:14px;margin-bottom:12px">Vous êtes</p>
+        <div class="radio-group" id="statutGroup">
+          <div class="radio-btn selected" data-val="proprietaire" onclick="selectRadio(this,'statut')">👤 Propriétaire</div>
+          <div class="radio-btn" data-val="locataire" onclick="selectRadio(this,'statut')">🏠 Locataire</div>
+        </div>
+        <div class="info-box info-yellow" id="locataireInfo" style="display:none">⚠️ En tant que locataire, certaines aides sont restreintes. Votre propriétaire peut cependant bénéficier de MaPrimeRénov.</div>
+      </div>
+
+      <div style="margin-bottom:32px">
+        <p style="font-weight:700;font-size:14px;margin-bottom:12px">Surface habitable</p>
+        <div class="slider-wrap">
+          <input class="slider-input" id="surfaceSlider" type="range" min="20" max="500" value="120" oninput="updateSurface(this)">
+        </div>
+        <div class="slider-display">
+          <span style="font-size:13px;color:var(--muted)">20 m²</span>
+          <div style="display:flex;align-items:baseline;gap:6px">
+            <input type="number" id="surfaceInput" value="120" min="20" max="500" style="width:70px;border:1px solid #DDD;border-radius:6px;padding:4px 8px;font-family:var(--font-m);font-size:22px;text-align:center;outline:none" oninput="syncSurface(this)">
+            <span style="font-family:var(--font-d);font-size:22px;color:var(--primary)">m²</span>
+          </div>
+          <span style="font-size:13px;color:var(--muted)">500 m²</span>
+        </div>
+        <p class="slider-hint">Astuce : inclure toutes les pièces chauffées</p>
+      </div>
+
+      <div style="margin-bottom:32px">
+        <p style="font-weight:700;font-size:14px;margin-bottom:12px">Année de construction</p>
+        <div class="year-btns" id="anneeGroup">
+          <div class="year-btn selected" data-val="av1975" onclick="selectYear(this)">Avant 1975</div>
+          <div class="year-btn" data-val="1975-2000" onclick="selectYear(this)">1975–2000</div>
+          <div class="year-btn" data-val="2000-2015" onclick="selectYear(this)">2000–2015</div>
+          <div class="year-btn" data-val="ap2015" onclick="selectYear(this)">Après 2015</div>
+        </div>
+        <div class="year-hint show" id="anneeHint">Avant 1975 : isolation quasi inexistante — fort potentiel d'économies</div>
+      </div>
+
+      <div style="margin-bottom:40px">
+        <p style="font-weight:700;font-size:14px;margin-bottom:12px">Code postal</p>
+        <input class="form-input" id="codePostal" type="text" placeholder="Ex : 51100 — Reims" maxlength="5" oninput="onCPChange(this)">
+        <div id="cpSuggestions" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px"></div>
+      </div>
+
+      <div class="sim-nav-btns" style="display:flex;justify-content:flex-end">
+        <button class="btn btn-primary" onclick="goStep(2)">Continuer →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="sim-panel" id="panel2">
+    <div class="container">
+      <div class="panel-tag">Étape 2 / 4</div>
+      <h2 class="panel-title">Votre situation énergétique</h2>
+      <p class="panel-sub">Votre chauffage actuel et votre consommation estimée</p>
+
+      <div style="margin-bottom:32px">
+        <p style="font-weight:700;font-size:14px;margin-bottom:16px">Type de chauffage actuel</p>
+        <div class="type-cards type-cards-5" id="chauffageCards">
+          <div class="type-card" data-val="gaz" onclick="selectTypeCard(this,'chauffage')"><span class="type-icon">🔥</span><span class="type-label">Gaz</span><span class="type-sub-eco">−45% à −60%</span></div>
+          <div class="type-card selected" data-val="fioul" onclick="selectTypeCard(this,'chauffage')"><span class="type-icon">🛢️</span><span class="type-label">Fioul</span><span class="type-sub-eco">−65% à −75%</span></div>
+          <div class="type-card" data-val="electrique" onclick="selectTypeCard(this,'chauffage')"><span class="type-icon">⚡</span><span class="type-label">Électricité</span><span class="type-sub-eco">−20% à −40%</span></div>
+          <div class="type-card" data-val="bois" onclick="selectTypeCard(this,'chauffage')"><span class="type-icon">🪵</span><span class="type-label">Bois</span><span class="type-sub-eco">−15% à −30%</span></div>
+          <div class="type-card" data-val="autre" onclick="selectTypeCard(this,'chauffage')"><span class="type-icon">❓</span><span class="type-label">Autre</span><span class="type-sub-eco">Variable</span></div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:32px">
+        <p style="font-weight:700;font-size:14px;margin-bottom:12px">Facture énergétique annuelle</p>
+        <div class="slider-wrap">
+          <input class="slider-input" id="factureSlider" type="range" min="500" max="6000" value="2200" oninput="updateFacture(this)">
+        </div>
+        <div class="slider-display">
+          <span style="font-size:13px;color:var(--muted)">500 €</span>
+          <span class="slider-val" id="factureVal">2 200 €/an</span>
+          <span style="font-size:13px;color:var(--muted)">6 000 €</span>
+        </div>
+        <div id="factureHint" class="slider-hint"></div>
+        <div class="estimate-card" id="estimateCard">
+          <p style="font-size:14px;font-weight:700;color:var(--primary);margin-bottom:6px">💡 Potentiel estimé selon vos réponses :</p>
+          <p style="font-size:14px;color:var(--text)">Entre <strong id="ecoMin">–</strong> et <strong id="ecoMax">–</strong> d'économies selon les travaux choisis</p>
+        </div>
+      </div>
+
+      <div style="margin-bottom:32px">
+        <p style="font-weight:700;font-size:14px;margin-bottom:12px">Étiquette DPE actuelle</p>
+        <div class="dpe-btns" id="dpeGroup">
+          <div class="dpe-btn" data-val="A" style="background:#009900;color:#fff" onclick="selectDPE(this)">A</div>
+          <div class="dpe-btn" data-val="B" style="background:#51BE00;color:#fff" onclick="selectDPE(this)">B</div>
+          <div class="dpe-btn" data-val="C" style="background:#BBCE00;color:#333" onclick="selectDPE(this)">C</div>
+          <div class="dpe-btn" data-val="D" style="background:#FBBA00;color:#333" onclick="selectDPE(this)">D</div>
+          <div class="dpe-btn selected" data-val="E" style="background:#FB7A00;color:#fff" onclick="selectDPE(this)">E</div>
+          <div class="dpe-btn" data-val="F" style="background:#E2001A;color:#fff" onclick="selectDPE(this)">F</div>
+          <div class="dpe-btn" data-val="G" style="background:#8F1214;color:#fff" onclick="selectDPE(this)">G</div>
+        </div>
+        <div class="dpe-btn-none" style="margin-top:10px"><label style="display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer"><input type="checkbox" id="dpeInconnu" style="accent-color:var(--accent)" onchange="toggleDPEInconnu(this)"> Je ne connais pas mon DPE</label></div>
+      </div>
+
+      <div style="margin-bottom:40px">
+        <p style="font-weight:700;font-size:14px;margin-bottom:12px">Travaux déjà réalisés</p>
+        <div style="display:flex;flex-direction:column;gap:10px" id="travauxDeja">
+          <label class="radio-check"><input type="checkbox" value="isolation_toiture" style="accent-color:var(--accent)"> Isolation de la toiture / combles</label>
+          <label class="radio-check"><input type="checkbox" value="isolation_murs" style="accent-color:var(--accent)"> Isolation des murs</label>
+          <label class="radio-check"><input type="checkbox" value="double_vitrage" style="accent-color:var(--accent)"> Double ou triple vitrage</label>
+          <label class="radio-check"><input type="checkbox" value="chaudiere_recente" style="accent-color:var(--accent)"> Chaudière récente (moins de 10 ans)</label>
+          <label class="radio-check"><input type="checkbox" value="aucun" id="aucunTravaux" onchange="toggleAucun(this)" style="accent-color:var(--accent)"> Aucun travaux réalisés</label>
+        </div>
+      </div>
+
+      <div class="sim-nav-btns" style="display:flex;gap:12px">
+        <button class="btn btn-secondary" onclick="goStep(1)">← Retour</button>
+        <button class="btn btn-primary" style="flex:1" onclick="goStep(3)">Continuer →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="sim-panel" id="panel3">
+    <div class="container">
+      <div class="panel-tag">Étape 3 / 4</div>
+      <h2 class="panel-title">Quels travaux vous intéressent ?</h2>
+      <p class="panel-sub">Sélectionnez tout ce qui vous semble pertinent — notre IA optimisera la combinaison</p>
+
+      <div class="work-cards" id="workCards">
+        <div class="work-card selected" data-val="pac_aireau" onclick="toggleWork(this)" style="position:relative">
+          <span class="work-icon">♨️</span><div class="work-label">PAC air/eau</div>
+          <div class="work-eco">Éco. typ. : −55% à −70%</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px"><span class="badge badge-success" style="font-size:10px">MaPrimeRénov</span><span class="badge badge-ai" style="font-size:10px">CEE</span></div>
+        </div>
+        <div class="work-card" data-val="pac_airair" onclick="toggleWork(this)">
+          <span class="work-icon">❄️</span><div class="work-label">PAC air/air</div>
+          <div class="work-eco">Éco. typ. : −30% à −45%</div>
+          <div style="margin-top:6px"><span class="badge badge-ai" style="font-size:10px">CEE</span></div>
+        </div>
+        <div class="work-card" data-val="ite" onclick="toggleWork(this)">
+          <span class="work-icon">🧱</span><div class="work-label">ITE</div>
+          <div class="work-eco">Éco. typ. : −25% à −35%</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px"><span class="badge badge-success" style="font-size:10px">MaPrimeRénov</span><span class="badge badge-ai" style="font-size:10px">CEE</span></div>
+        </div>
+        <div class="work-card" data-val="combles" onclick="toggleWork(this)">
+          <span class="work-icon">🏔️</span><div class="work-label">Isolation combles</div>
+          <div class="work-eco">ROI souvent &lt; 5 ans</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px"><span class="badge badge-success" style="font-size:10px">MaPrimeRénov</span><span class="badge badge-ai" style="font-size:10px">CEE</span></div>
+        </div>
+        <div class="work-card" data-val="murs" onclick="toggleWork(this)">
+          <span class="work-icon">🪟</span><div class="work-label">Isolation murs int.</div>
+          <div class="work-eco">Éco. typ. : −15% à −25%</div>
+          <div style="margin-top:6px"><span class="badge badge-success" style="font-size:10px">MaPrimeRénov</span></div>
+        </div>
+        <div class="work-card" data-val="vmc" onclick="toggleWork(this)">
+          <span class="work-icon">💨</span><div class="work-label">VMC double flux</div>
+          <div class="work-eco">Éco. typ. : −10% à −20%</div>
+          <div style="margin-top:6px"><span class="badge badge-ai" style="font-size:10px">CEE</span></div>
+        </div>
+        <div class="work-card" data-val="pack" onclick="toggleWorkPack(this)" style="position:relative;border-style:dashed">
+          <span class="recommend-badge">RECOMMANDÉ</span>
+          <span class="work-icon">🏆</span><div class="work-label">Pack rénovation globale</div>
+          <div class="work-eco">Éco. typ. : −65% à −80%</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px"><span class="badge badge-success" style="font-size:10px">TOUS LES DISPOSITIFS</span></div>
+        </div>
+      </div>
+
+      <div class="live-counter" id="liveCounter">
+        <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.7);margin-bottom:12px;text-transform:uppercase;letter-spacing:.06em">Estimation combinée</div>
+        <span class="live-counter-val" id="liveEco">–</span>
+        <span class="live-counter-label">d'économies annuelles estimées</span>
+        <div style="display:flex;gap:24px;margin-top:16px;flex-wrap:wrap">
+          <div><div style="font-family:var(--font-m);font-size:16px;color:var(--accent)" id="liveAides">–</div><div style="font-size:12px;color:rgba(255,255,255,.6)">Aides estimées</div></div>
+          <div><div style="font-family:var(--font-m);font-size:16px;color:#fff" id="liveReste">–</div><div style="font-size:12px;color:rgba(255,255,255,.6)">Reste à charge estimé</div></div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:40px">
+        <p style="font-weight:700;font-size:14px;margin-bottom:12px">Horizon du projet</p>
+        <div class="radio-group" id="horizonGroup">
+          <div class="radio-btn selected" data-val="now" onclick="selectRadio(this,'horizon')">🚀 Dès que possible</div>
+          <div class="radio-btn" data-val="6mois" onclick="selectRadio(this,'horizon')">📅 Dans 6 mois</div>
+          <div class="radio-btn" data-val="1an" onclick="selectRadio(this,'horizon')">🗓️ Dans 1 an</div>
+          <div class="radio-btn" data-val="info" onclick="selectRadio(this,'horizon')">🔍 Je me renseigne</div>
+        </div>
+      </div>
+
+      <div class="sim-nav-btns" style="display:flex;gap:12px">
+        <button class="btn btn-secondary" onclick="goStep(2)">← Retour</button>
+        <button class="btn btn-primary" style="flex:1" onclick="goStep(4)">Continuer →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="sim-panel" id="panel4">
+    <div class="container">
+      <div class="panel-tag">Étape 4 / 4</div>
+      <h2 class="panel-title">Dernière étape</h2>
+      <p class="panel-sub">Vos résultats sont prêts — entrez vos coordonnées pour y accéder</p>
+
+      <div class="info-box info-green" style="margin-bottom:28px" id="profileRecap">
+        🎯 <strong>Votre profil :</strong> <span id="recapText">–</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+        <div><label style="display:block;font-size:14px;font-weight:700;margin-bottom:6px">Prénom *</label><input class="form-input" id="simPrenom" placeholder="Votre prénom" required></div>
+        <div><label style="display:block;font-size:14px;font-weight:700;margin-bottom:6px">Nom</label><input class="form-input" id="simNom" placeholder="Votre nom"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+        <div><label style="display:block;font-size:14px;font-weight:700;margin-bottom:6px">Email *</label><input class="form-input" id="simEmail" type="email" placeholder="votre@email.com" required oninput="validateEmail(this)"></div>
+        <div><label style="display:block;font-size:14px;font-weight:700;margin-bottom:6px">Téléphone</label><input class="form-input" id="simTel" type="tel" placeholder="06 XX XX XX XX"></div>
+      </div>
+      <div style="margin-bottom:16px"><label style="display:block;font-size:14px;font-weight:700;margin-bottom:6px">Code postal *</label><input class="form-input" id="simCP" placeholder="51100" maxlength="5"></div>
+      <div style="margin-bottom:20px"><label style="display:block;font-size:14px;font-weight:700;margin-bottom:6px">Message (optionnel)</label><textarea class="form-textarea" id="simMsg" placeholder="Avez-vous des précisions à ajouter ?"></textarea></div>
+
+      <label style="display:flex;align-items:flex-start;gap:10px;margin-bottom:20px;cursor:pointer">
+        <input type="checkbox" id="rgpd" style="margin-top:3px;accent-color:var(--accent)">
+        <span style="font-size:13px;color:var(--muted)">J'accepte que mes données soient utilisées pour ma simulation. Pas de démarchage abusif. <a href="#" style="color:var(--accent)">Politique RGPD</a></span>
+      </label>
+
+      <button class="btn btn-primary btn-full" style="font-size:17px;padding:18px" onclick="submitSim()">🚀 Obtenir mes résultats personnalisés</button>
+
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:16px;align-items:center">
+        <span style="font-size:13px;color:var(--muted)">🔒 Données chiffrées AES-256</span>
+        <span style="font-size:13px;color:var(--muted)">📧 Pas de spam — désabonnement à tout moment</span>
+        <span style="font-size:13px;color:var(--muted)">⏱️ Résultats disponibles en 2 secondes</span>
+      </div>
+
+      <div style="display:flex;gap:12px;margin-top:24px">
+        <button class="btn btn-secondary" onclick="goStep(3)">← Retour</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="sim-panel" id="panelLoading">
+    <div class="loading-screen active">
+      <div style="font-size:48px;margin-bottom:24px;animation:pulse 2s infinite">🤖</div>
+      <h2 style="font-family:var(--font-d);font-weight:700;font-size:24px;color:var(--primary);margin-bottom:8px">Calcul de vos résultats…</h2>
+      <p class="loading-text" id="loadingText">Analyse de votre profil sur 847 chantiers réels...</p>
+      <div class="loading-progress"><div class="loading-progress-fill" id="loadingBar" style="width:0"></div></div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="sim-panel" id="panelResults">
+    <div class="container-wide" style="padding-top:48px;padding-bottom:80px">
+      <div id="resultsContent"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONTACT -->
+<div class="modal-overlay" id="contactModal" onclick="if(event.target===this)closeContactModal()">
+  <div class="modal">
+    <div class="modal-icon">✅</div>
+    <div class="modal-title">Demande transmise !</div>
+    <p style="color:var(--muted);font-size:15px;margin-bottom:24px">Un expert EcoTech vous contactera sous 24h pour affiner votre projet.</p>
+    <button class="btn btn-primary btn-full" onclick="closeContactModal()">Parfait, merci !</button>
+  </div>
+</div>
+
+<style>
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.radio-check{display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 12px;border-radius:8px;transition:background .2s;font-size:14px}
+.radio-check:hover{background:rgba(82,183,136,.08)}
+</style>
+<script>
+// ===== STATE =====
+let simData = {
+  logType:'maison', statut:'proprietaire', surface:120, annee:'av1975', cp:'',
+  chauffage:'fioul', facture:2200, dpe:'E', travauxDeja:[],
+  works:['pac_aireau'], horizon:'now',
+  prenom:'', nom:'', email:'', tel:'', cp2:'', msg:''
+};
+let currentStep = 0;
+
+function startSim(){
+  document.getElementById('entryPage').classList.add('hidden');
+  document.getElementById('simWrapper').style.display='block';
+  goStep(1);
+  // Restore from localStorage
+  try{const saved=localStorage.getItem('clearreno_sim');if(saved)simData={...simData,...JSON.parse(saved)};}catch(e){}
+}
+
+function resetSim(){
+  simData={logType:'maison',statut:'proprietaire',surface:120,annee:'av1975',cp:'',chauffage:'fioul',facture:2200,dpe:'E',travauxDeja:[],works:['pac_aireau'],horizon:'now',prenom:'',nom:'',email:'',tel:'',cp2:'',msg:''};
+  localStorage.removeItem('clearreno_sim');
+  document.getElementById('entryPage').classList.remove('hidden');
+  document.getElementById('simWrapper').style.display='none';
+  currentStep=0;
+}
+
+function save(){try{localStorage.setItem('clearreno_sim',JSON.stringify(simData));}catch(e){}}
+
+function goStep(n){
+  document.querySelectorAll('.sim-panel').forEach(p=>p.classList.remove('active'));
+  const pid=n==='loading'?'panelLoading':n==='results'?'panelResults':`panel${n}`;
+  const panel=document.getElementById(pid);
+  if(panel)panel.classList.add('active');
+  currentStep=n;
+  // Update steps UI
+  document.querySelectorAll('.sim-step').forEach(s=>{
+    const sn=parseInt(s.dataset.s);
+    s.classList.remove('active','done');
+    if(sn===n)s.classList.add('active');
+    else if(sn<n)s.classList.add('done');
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(n===4)updateRecap();
+  save();
+}
+
+// SURFACE
+function updateSurface(sl){
+  const v=parseInt(sl.value);
+  const pct=((v-20)/(500-20)*100).toFixed(1);
+  sl.style.setProperty('--pct',pct+'%');
+  document.getElementById('surfaceInput').value=v;
+  simData.surface=v; save();
+}
+function syncSurface(inp){
+  let v=Math.min(Math.max(parseInt(inp.value)||20,20),500);
+  inp.value=v;
+  const sl=document.getElementById('surfaceSlider');
+  sl.value=v;
+  updateSurface(sl);
+}
+// init slider
+setTimeout(()=>{const sl=document.getElementById('surfaceSlider');if(sl)updateSurface(sl);const fs=document.getElementById('factureSlider');if(fs)updateFacture(fs);},100);
+
+// FACTURE
+function updateFacture(sl){
+  const v=parseInt(sl.value);
+  const pct=((v-500)/(6000-500)*100).toFixed(1);
+  sl.style.setProperty('--pct',pct+'%');
+  document.getElementById('factureVal').textContent=v.toLocaleString('fr-FR')+' €/an';
+  simData.facture=v;
+  const nat=1900;
+  document.getElementById('factureHint').textContent=v>nat?`Vous êtes au-dessus de la moyenne nationale (${nat.toLocaleString('fr-FR')} €/an)`:`Vous êtes en dessous de la moyenne nationale (${nat.toLocaleString('fr-FR')} €/an)`;
+  updateEstimate();
+  updateLive();
+  save();
+}
+
+function updateEstimate(){
+  const f=simData.facture;
+  const factor={fioul:0.55,gaz:0.42,electrique:0.28,bois:0.25,autre:0.35};
+  const fac=factor[simData.chauffage]||0.35;
+  const mn=Math.round(f*fac*0.8);
+  const mx=Math.round(f*fac*1.2);
+  document.getElementById('ecoMin').textContent=mn.toLocaleString('fr-FR')+'€';
+  document.getElementById('ecoMax').textContent=mx.toLocaleString('fr-FR')+'€/an';
+  document.getElementById('estimateCard').classList.add('show');
+}
+
+// TYPE CARD
+function selectTypeCard(el,key){
+  el.closest('.type-cards').querySelectorAll('.type-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  simData[key]=el.dataset.val;
+  if(key==='chauffage'){updateEstimate();updateLive();}
+  save();
+}
+
+// RADIO
+function selectRadio(el,key){
+  el.closest('.radio-group').querySelectorAll('.radio-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+  simData[key]=el.dataset.val;
+  if(key==='statut'){document.getElementById('locataireInfo').style.display=el.dataset.val==='locataire'?'flex':'none';}
+  save();
+}
+
+// YEAR
+const yearHints={av1975:'Avant 1975 : isolation quasi inexistante — fort potentiel d\'économies','1975-2000':'1975–2000 : isolation partielle — bon potentiel','2000-2015':'2000–2015 : isolation correcte — PAC recommandée',ap2015:'Après 2015 : déjà bien isolé — PAC et VMC prioritaires'};
+function selectYear(el){
+  document.querySelectorAll('.year-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+  simData.annee=el.dataset.val;
+  const hint=document.getElementById('anneeHint');
+  hint.textContent=yearHints[el.dataset.val]||'';
+  hint.classList.add('show');
+  save();
+}
+
+// DPE
+function selectDPE(el){
+  document.querySelectorAll('.dpe-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+  simData.dpe=el.dataset.val;
+  save();
+}
+function toggleDPEInconnu(cb){
+  document.querySelectorAll('.dpe-btn').forEach(b=>{b.classList.remove('selected');b.style.opacity=cb.checked?'0.3':'0.7';b.style.pointerEvents=cb.checked?'none':'auto';});
+  if(cb.checked)simData.dpe='inconnu';
+}
+
+// AUCUN TRAVAUX
+function toggleAucun(cb){
+  if(cb.checked){document.querySelectorAll('#travauxDeja input[type=checkbox]:not(#aucunTravaux)').forEach(c=>c.checked=false);}
+}
+
+// WORKS
+function toggleWork(el){
+  if(document.querySelector('[data-val="pack"].selected')&&el.dataset.val!=='pack'){
+    document.querySelector('[data-val="pack"]').classList.remove('selected');
+    simData.works=simData.works.filter(w=>w!=='pack');
+  }
+  el.classList.toggle('selected');
+  const v=el.dataset.val;
+  if(el.classList.contains('selected')){if(!simData.works.includes(v))simData.works.push(v);}
+  else{simData.works=simData.works.filter(w=>w!==v);}
+  updateLive(); save();
+}
+function toggleWorkPack(el){
+  const ws=document.querySelectorAll('.work-card:not([data-val="pack"])');
+  el.classList.toggle('selected');
+  if(el.classList.contains('selected')){ws.forEach(w=>w.classList.remove('selected'));simData.works=['pack'];}
+  else{simData.works=[];}
+  updateLive(); save();
+}
+
+// LIVE COUNTER
+function updateLive(){
+  const r=calcEconomies();
+  const eco=r.eco_euros;
+  const invest=r.invest_estime;
+  const aides=r.aides;
+  const reste=Math.max(invest-aides,0);
+  document.getElementById('liveEco').textContent=eco?eco.toLocaleString('fr-FR')+' €/an':'Sélectionnez des travaux';
+  document.getElementById('liveAides').textContent=aides?'~'+aides.toLocaleString('fr-FR')+' €':'–';
+  document.getElementById('liveReste').textContent=reste?'~'+reste.toLocaleString('fr-FR')+' €':'–';
+}
+
+// CP AUTOCOMPLETE
+const cpVilles={'51':['Reims','Épernay','Châlons-en-Champagne','Vitry-le-François','Ay'],'75':['Paris 1er','Paris 11e','Paris 15e'],'69':['Lyon','Villeurbanne','Vénissieux'],'67':['Strasbourg','Schiltigheim'],'54':['Nancy','Vandœuvre-lès-Nancy'],'33':['Bordeaux','Mérignac','Pessac'],'44':['Nantes','Saint-Nazaire']};
+function onCPChange(inp){
+  const v=inp.value;
+  simData.cp=v;
+  const dept=v.substring(0,2);
+  const sug=cpVilles[dept]||[];
+  const el=document.getElementById('cpSuggestions');
+  el.innerHTML=sug.slice(0,4).map(c=>`<span class="sug-pill" style="padding:6px 12px;border:1.5px solid #DDD;border-radius:100px;font-size:13px;font-weight:600;cursor:pointer;background:#fff;color:var(--muted)" onclick="selectVille('${c}',this)">${c}</span>`).join('');
+}
+function selectVille(v,el){
+  document.getElementById('codePostal').value=simData.cp;
+  document.querySelectorAll('#cpSuggestions .sug-pill').forEach(s=>s.style.background='#fff');
+  el.style.background=el.style.borderColor='var(--accent)';
+  el.style.color='#fff';
+}
+
+// RECAP
+function updateRecap(){
+  const typeMap={maison:'Maison',appartement:'Appartement',pro:'Local pro'};
+  const chaufMap={gaz:'Gaz',fioul:'Fioul',electrique:'Électricité',bois:'Bois',autre:'Autre'};
+  const workMap={pac_aireau:'PAC air/eau',pac_airair:'PAC air/air',ite:'ITE',combles:'Combles',murs:'Murs int.',vmc:'VMC',pack:'Pack global'};
+  const recap=`${typeMap[simData.logType]||'Logement'} ${simData.surface}m² | ${chaufMap[simData.chauffage]||'Chauffage'} | ${simData.works.map(w=>workMap[w]).join(', ')||'Travaux à définir'}`;
+  document.getElementById('recapText').textContent=recap;
+  const r=calcEconomies();
+  const el=document.getElementById('profileRecap');
+  el.innerHTML=`🎯 <strong>Votre profil :</strong> ${recap}<br>💰 <strong>Estimation préliminaire :</strong> ~${r.eco_euros.toLocaleString('fr-FR')}€/an d'économies · ~${r.aides.toLocaleString('fr-FR')}€ d'aides`;
+  // pre-fill cp
+  const cpEl=document.getElementById('simCP');
+  if(cpEl&&!cpEl.value&&simData.cp)cpEl.value=simData.cp;
+}
+
+function validateEmail(inp){inp.style.borderColor=inp.value.includes('@')&&inp.value.includes('.')?'var(--accent)':'var(--error)';}
+
+// CALCUL
+function calcEconomies(){
+  const facteurs={fioul:{base:.68,pac_aireau:.70,pac_airair:.45,ite:.30,combles:.25,murs:.20,vmc:.15},gaz:{base:.50,pac_aireau:.55,pac_airair:.38,ite:.28,combles:.22,murs:.18,vmc:.12},electrique:{base:.30,pac_aireau:.40,pac_airair:.35,ite:.25,combles:.20,murs:.15,vmc:.18},bois:{base:.25,pac_aireau:.30,pac_airair:.20,ite:.20,combles:.18,murs:.14,vmc:.12},autre:{base:.35,pac_aireau:.45,pac_airair:.35,ite:.25,combles:.22,murs:.16,vmc:.13}};
+  const f=facteurs[simData.chauffage]||facteurs.gaz;
+  let taux=0;
+  const works=simData.works;
+  if(works.includes('pack')){taux=.75;}
+  else{works.forEach(w=>{taux+=f[w]||0;});taux=Math.min(taux,.82);}
+  if(simData.dpe==='F'||simData.dpe==='G')taux=Math.min(taux*1.2,.88);
+  if(simData.annee==='av1975')taux=Math.min(taux*1.1,.88);
+  const eco_euros=Math.round(simData.facture*taux);
+  const eco_kwh=Math.round(eco_euros/0.22);
+  const baremes={pac_aireau:{base:8000,m:45,i:5000,s:1000},pac_airair:{base:1500,m:0,i:0,s:0},ite:{base:10000,m:0,i:7000,s:2000},combles:{base:2500,m:0,i:1500,s:500},murs:{base:3500,m:0,i:2000,s:600},vmc:{base:1200,m:0,i:0,s:0},pack:{base:15000,m:0,i:8000,s:2000}};
+  let aides=0;
+  works.forEach(w=>{if(baremes[w])aides+=baremes[w].base;});
+  aides=Math.min(aides,eco_euros*12);
+  const invest_estime=works.includes('pack')?Math.round(simData.surface*180):works.reduce((s,w)=>s+({pac_aireau:120,pac_airair:60,ite:150,combles:30,murs:80,vmc:40,pack:200}[w]||80)*simData.surface,0);
+  const roi=invest_estime>0&&eco_euros>0?Math.round((invest_estime-aides)/eco_euros*10)/10:0;
+  return{eco_euros,eco_kwh,taux:Math.round(taux*100),invest_estime,aides,roi};
+}
+
+// SUBMIT
+async function submitSim(){
+  const prenom=document.getElementById('simPrenom').value.trim();
+  const email=document.getElementById('simEmail').value.trim();
+  if(!prenom||!email){alert('Merci de renseigner votre prénom et email.');return;}
+  if(!document.getElementById('rgpd').checked){alert('Veuillez accepter la politique RGPD.');return;}
+  simData.prenom=prenom;
+  simData.nom=document.getElementById('simNom').value;
+  simData.email=email;
+  simData.tel=document.getElementById('simTel').value;
+  goStep('loading');
+  // Loading animation
+  const steps=['Analyse de votre profil sur 847 chantiers réels...','Calcul des aides 2026 disponibles...','Optimisation de la combinaison de travaux...','Génération de votre recommandation personnalisée...','Finalisation de votre rapport...'];
+  let i=0,pct=0;
+  const interval=setInterval(()=>{
+    pct=Math.min(pct+20,100);
+    document.getElementById('loadingBar').style.width=pct+'%';
+    if(i<steps.length){document.getElementById('loadingText').textContent=steps[i];i++;}
+    if(pct>=100){clearInterval(interval);setTimeout(()=>{goStep('results');renderResults();},400);}
+  },500);
+}
+
+async function renderResults(){
+  const r=calcEconomies();
+  const {eco_euros,eco_kwh,taux,invest_estime,aides,roi}=r;
+  const prenom=simData.prenom||'vous';
+  // SVG chart
+  const years=10,chartW=700,chartH=240,padL=60,padB=40,padT=20;
+  const pts=Array.from({length:years},(_, i)=>{
+    const x=padL+(i*(chartW-padL-20)/(years-1));
+    const y=chartH-padB-((i+1)*eco_euros/(eco_euros*years))*(chartH-padB-padT);
+    return{x,y,val:(i+1)*eco_euros};
+  });
+  const ptsStr=pts.map(p=>`${p.x},${p.y}`).join(' ');
+  const roiYear=roi>0?Math.ceil(roi):0;
+  const roiPt=pts[Math.min(roiYear-1,years-1)];
+  const gridLines=Array.from({length:5},(_, i)=>{
+    const v=Math.round(eco_euros*years*i/4);
+    const y=chartH-padB-((v/(eco_euros*years))*(chartH-padB-padT));
+    return{y,v};
+  });
+  const svgChart=`<svg viewBox="0 0 ${chartW} ${chartH}" width="100%" style="overflow:visible">
+    ${gridLines.map(g=>`<line x1="${padL}" x2="${chartW-20}" y1="${g.y}" y2="${g.y}" stroke="#EEE" stroke-width="1" stroke-dasharray="4 4"/>
+    <text x="${padL-6}" y="${g.y+4}" text-anchor="end" font-size="10" fill="#999" font-family="JetBrains Mono,monospace">${(g.v/1000).toFixed(0)}k€</text>`).join('')}
+    ${pts.map(p=>`<text x="${p.x}" y="${chartH-8}" text-anchor="middle" font-size="10" fill="#999" font-family="Satoshi,sans-serif">An ${pts.indexOf(p)+1}</text>`).join('')}
+    <polygon points="${padL},${chartH-padB} ${ptsStr} ${pts[years-1].x},${chartH-padB}" fill="rgba(82,183,136,0.12)"/>
+    <polyline points="${ptsStr}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round"/>
+    ${pts.map((p,i)=>`<circle cx="${p.x}" cy="${p.y}" r="${i===roiYear-1?6:3}" fill="${i===roiYear-1?'#E63946':'var(--accent)'}" stroke="#fff" stroke-width="2"/>`).join('')}
+    ${roiPt?`<text x="${roiPt.x}" y="${roiPt.y-10}" text-anchor="middle" font-size="10" fill="#E63946" font-weight="700" font-family="Satoshi,sans-serif">Seuil ROI</text>`:''}
+  </svg>`;
+
+  const workLabels={pac_aireau:'PAC air/eau',pac_airair:'PAC air/air',ite:'ITE',combles:'Isolation combles',murs:'Isolation murs',vmc:'VMC double flux',pack:'Pack rénovation globale'};
+  const worksText=simData.works.map(w=>workLabels[w]).join(' + ')||'Travaux combinés';
+
+  document.getElementById('resultsContent').innerHTML=`
+    <div style="text-align:center;margin-bottom:16px"><span class="badge badge-success">✓ Résultats calculés sur données réelles — ${new Date().toLocaleDateString('fr-FR')}</span></div>
+    <div class="results-hero">
+      <p style="color:rgba(255,255,255,.7);font-size:15px;margin-bottom:8px">Bonjour ${prenom}, voici votre estimation personnalisée</p>
+      <div style="font-family:var(--font-m);font-size:64px;font-weight:700;color:var(--accent);line-height:1">Jusqu'à ${eco_euros.toLocaleString('fr-FR')} €</div>
+      <p style="font-size:18px;color:rgba(255,255,255,.85);margin-top:8px">d'économies par an sur votre facture de ${simData.facture.toLocaleString('fr-FR')} €/an</p>
+      <p style="font-size:13px;color:rgba(255,255,255,.55);margin-top:12px">Travaux : ${worksText}</p>
+    </div>
+    <div class="results-kpis">
+      <div class="kpi-card"><div class="kpi-val">${eco_euros.toLocaleString('fr-FR')} €</div><div class="kpi-label">Économies annuelles</div><div class="kpi-sub">−${taux}% sur votre facture</div></div>
+      <div class="kpi-card"><div class="kpi-val">${eco_kwh.toLocaleString('fr-FR')}</div><div class="kpi-label">kWh économisés/an</div><div class="kpi-sub">≈ ${Math.round(eco_kwh/400).toLocaleString('fr-FR')} km en voiture</div></div>
+      <div class="kpi-card"><div class="kpi-val">${roi} ans</div><div class="kpi-label">Retour sur investissement</div><div class="kpi-sub">Après déduction des aides</div></div>
+    </div>
+    <div class="chart-card"><div class="chart-title">📈 Projection de vos économies cumulées sur 10 ans</div>${svgChart}</div>
+    <div class="aides-card">
+      <h3 style="font-family:var(--font-d);font-weight:600;font-size:18px;color:var(--primary);margin-bottom:20px">💰 Aides financières auxquelles vous êtes éligible</h3>
+      <div class="aide-row"><span style="font-weight:600">MaPrimeRénov'</span><span style="font-family:var(--font-m);color:var(--secondary)">${Math.round(aides*0.6).toLocaleString('fr-FR')} €</span></div>
+      <div class="aide-row"><span style="font-weight:600">Certificats d'Économies d'Énergie (CEE)</span><span style="font-family:var(--font-m);color:var(--secondary)">${Math.round(aides*0.2).toLocaleString('fr-FR')} €</span></div>
+      <div class="aide-row"><span style="font-weight:600">Éco-PTZ</span><span style="font-family:var(--font-m);color:var(--secondary)">Jusqu'à 50 000 €</span></div>
+      <div class="aide-row"><span style="font-weight:600">Aide régionale estimée</span><span style="font-family:var(--font-m);color:var(--secondary)">${Math.round(aides*0.2).toLocaleString('fr-FR')} €</span></div>
+      <div class="aide-total"><span style="font-size:16px">Total aides estimées</span><span style="font-family:var(--font-m);font-size:18px">${aides.toLocaleString('fr-FR')} €</span></div>
+      <div style="margin-top:12px;display:flex;justify-content:space-between;padding:12px 0;font-size:14px"><span style="color:var(--muted)">Reste à charge estimé</span><span style="font-family:var(--font-m);font-weight:700;color:var(--primary)">${Math.max(invest_estime-aides,0).toLocaleString('fr-FR')} €</span></div>
+    </div>
+    <div class="ai-reco" id="aiRecoBlock">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+        <span style="background:var(--accent);color:#fff;padding:4px 10px;border-radius:var(--r-badge);font-size:11px;font-weight:700">✨ Recommandation IA</span>
+        <span style="font-size:14px;font-weight:700;color:var(--primary)">Personnalisée pour votre profil</span>
+      </div>
+      <div id="aiRecoContent">${[90,75,80,70].map((w,i)=>`<div class="skeleton" style="height:16px;margin-bottom:10px;width:${w}%"></div>`).join('')}</div>
+    </div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px">
+      <button class="btn btn-primary" style="flex:1" onclick="document.getElementById('contactModal').classList.add('open')">📞 Être contacté par un expert</button>
+      <button class="btn btn-secondary" style="flex:1" onclick="alert('Redirection vers le Hub de Preuves…')">Voir des chantiers similaires</button>
+    </div>
+    <button class="btn btn-ghost btn-full" onclick="window.print()">📄 Télécharger mon rapport PDF</button>
+  `;
+  loadAIReco(r);
+}
+
+async function loadAIReco(r){
+  try{
+    const prompt=`Tu es conseiller rénovation énergétique ClearRéno. Génère une recommandation pour ce prospect.
+Profil : chauffage ${simData.chauffage}, surface ${simData.surface}m², DPE ${simData.dpe}, travaux : ${simData.works.join(', ')}.
+Résultats : ${r.eco_euros}€/an économisés, ROI ${r.roi} ans, aides ${r.aides}€.
+Réponds UNIQUEMENT en JSON :
+{"titre":"Titre court et percutant (max 10 mots)","priorite":"Le travaux le plus rentable et pourquoi (2 phrases)","sequence":"L'ordre optimal si budget limité (2 phrases)","conseil_financement":"Conseil sur les aides disponibles (2 phrases)","urgence":"Pourquoi agir maintenant (1 phrase)"}`;
+    const text=await window.claude.complete(prompt);
+    const data=JSON.parse(text);
+    const el=document.getElementById('aiRecoContent');
+    if(!el)return;
+    el.innerHTML=`<h3 style="font-family:var(--font-d);font-weight:600;font-size:18px;color:var(--primary);margin-bottom:16px">${data.titre}</h3>
+    ${[['🎯','Priorité',data.priorite],['📋','Séquence optimale',data.sequence],['💰','Financement',data.conseil_financement],['⏰','Pourquoi maintenant',data.urgence]].map(([ic,lb,txt])=>`<div style="display:flex;gap:12px;margin-bottom:14px"><span style="font-size:20px;flex-shrink:0">${ic}</span><div><div style="font-weight:700;font-size:13px;color:var(--primary);font-family:var(--font-d);margin-bottom:2px">${lb}</div><div style="font-size:14px;line-height:1.6">${txt}</div></div></div>`).join('')}`;
+  } catch(e){
+    const el=document.getElementById('aiRecoContent');
+    if(el){const reco={fioul:'La pompe à chaleur air/eau est la solution la plus rentable pour remplacer votre fioul. Avec un COP de 3 à 4, elle produit 3 à 4× plus d\'énergie qu\'elle n\'en consomme.',gaz:'Le passage à la PAC air/eau vous permettra de diviser votre facture par 2 tout en améliorant votre confort.',electrique:'Une PAC air/air combinée à une isolation renforcée maximisera vos économies.',bois:'Votre chauffage bois est déjà vertueux — une VMC double flux améliorera votre qualité d\'air.',autre:'Une étude thermique identifiera le meilleur mix de solutions.'};el.innerHTML=`<p style="font-size:14px;line-height:1.6">${reco[simData.chauffage]||reco.autre}</p>`;}
+  }
+}
+
+function closeContactModal(){document.getElementById('contactModal').classList.remove('open');}
+
+// INIT
+document.addEventListener('DOMContentLoaded',()=>{
+  updateLive();
+  // Restore if saved
+  try{const saved=localStorage.getItem('clearreno_sim');if(saved){const d=JSON.parse(saved);Object.assign(simData,d);}}catch(e){}
+});
+</script>
+</body>
+</html>
