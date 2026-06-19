@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /espace-client
+Disallow: /ClearReno-print.html
+
+Sitemap: https://www.clearreno.fr/sitemap.xml

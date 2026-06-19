@@ -3,7 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ClearRéno — Suivi de Chantier</title>
+<title>Espace client & suivi de chantier en temps réel | ClearRéno</title>
+<meta name="description" content="Suivez votre chantier de rénovation énergétique en temps réel : timeline détaillée, messagerie avec votre chef de projet, documents et guides PAC. Espace client ClearRéno par EcoTech Solutions.">
+<meta name="keywords" content="suivi chantier rénovation, espace client, timeline travaux, messagerie chef de projet, documents chantier, guide pompe à chaleur, ClearRéno, EcoTech Solutions">
+<meta name="author" content="EcoTech Solutions">
+<meta name="robots" content="noindex, follow">
+<meta name="theme-color" content="#1A3C2E">
+<meta name="language" content="fr">
+<link rel="canonical" href="https://www.clearreno.fr/espace-client">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ClearRéno">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:url" content="https://www.clearreno.fr/espace-client">
+<meta property="og:title" content="Espace client & suivi de chantier en temps réel | ClearRéno">
+<meta property="og:description" content="Timeline, messagerie chef de projet, documents et guides. Votre chantier suivi en temps réel.">
+<meta property="og:image" content="https://www.clearreno.fr/og-suivi.jpg">
+<meta property="og:image:alt" content="Espace client et suivi de chantier ClearRéno">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Espace client & suivi de chantier | ClearRéno">
+<meta name="twitter:description" content="Suivez votre chantier en temps réel : timeline, messagerie, documents.">
+<meta name="twitter:image" content="https://www.clearreno.fr/og-suivi.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%231A3C2E'/%3E%3Ctext x='50' y='68' font-size='58' text-anchor='middle' fill='%2352B788' font-family='Georgia,serif' font-weight='bold'%3EC%3C/text%3E%3C/svg%3E">
 <link href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&f[]=satoshi@400,600,700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
 <style>
@@ -221,6 +241,7 @@ body{font-family:var(--font-b);color:var(--text);background:var(--bg);overflow-x
     </div>
   </div>
 </nav>
+<main id="contenu-principal">
 <div class="breadcrumb" style="padding-top:72px">
   <div class="breadcrumb-inner">Accueil > Mon chantier > <span>ECO-2026-0847 — PAC air/eau</span></div>
 </div>
@@ -240,7 +261,7 @@ body{font-family:var(--font-b);color:var(--text);background:var(--bg);overflow-x
 <div class="tab-content active" id="tab-dashboard">
   <div class="dash-header">
     <div class="container">
-      <div class="dash-greeting">Bonjour Thomas 👋</div>
+      <h1 class="dash-greeting">Bonjour Thomas 👋</h1>
       <p style="color:var(--muted);font-size:16px;margin-bottom:4px">Votre chantier avance bien ! Étape 4 sur 7 en cours.</p>
       <p style="font-size:13px;color:var(--muted)">Lundi 11 mai 2026</p>
     </div>
@@ -384,8 +405,8 @@ body{font-family:var(--font-b);color:var(--text);background:var(--bg);overflow-x
         </div>
         <div class="chat-footer">
           <div class="chat-tools">
-            <button class="chat-tool" onclick="alert('Pièce jointe — disponible en production')">📎</button>
-            <button class="chat-tool" onclick="alert('Photo — disponible en production')">📷</button>
+            <button class="chat-tool" onclick="alert('Pièce jointe — disponible en production')" aria-label="Joindre un fichier">📎</button>
+            <button class="chat-tool" onclick="alert('Photo — disponible en production')" aria-label="Ajouter une photo">📷</button>
           </div>
           <input class="chat-input" id="chatInput" placeholder="Rédigez votre message à Marc..." onkeydown="if(event.key==='Enter')sendMsg()">
           <button class="btn btn-primary btn-sm" onclick="sendMsg()">Envoyer</button>
@@ -451,7 +472,7 @@ body{font-family:var(--font-b);color:var(--text);background:var(--bg);overflow-x
   <div class="ai-drawer-header" style="position:relative">
     <div style="font-family:var(--font-d);font-weight:700;font-size:16px;color:#fff" id="drawerTitle">Assistant technique</div>
     <div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:4px" id="drawerSub">Questions sur l'étape en cours</div>
-    <button class="ai-drawer-close" onclick="closeAiDrawer()">✕</button>
+    <button class="ai-drawer-close" onclick="closeAiDrawer()" aria-label="Fermer l'assistant">✕</button>
   </div>
   <div class="ai-sug-qs" id="drawerSugQs"></div>
   <div class="ai-messages" id="drawerMessages"></div>
@@ -464,12 +485,14 @@ body{font-family:var(--font-b);color:var(--text);background:var(--bg);overflow-x
   </div>
 </div>
 
+</main>
+
 <!-- MODAL PHOTOS -->
 <div class="modal-overlay" id="photoModal" onclick="if(event.target===this)closePhotoModal()">
   <div class="modal">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
       <h3 style="font-family:var(--font-d);font-weight:600;font-size:20px">📸 Photos de chantier</h3>
-      <button onclick="closePhotoModal()" style="border:none;background:rgba(0,0,0,.06);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:15px">✕</button>
+      <button onclick="closePhotoModal()" aria-label="Fermer la galerie" style="border:none;background:rgba(0,0,0,.06);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:15px">✕</button>
     </div>
     <div class="photo-grid" style="grid-template-columns:repeat(3,1fr)">
       <div class="photo-thumb" style="background:linear-gradient(135deg,#1A3C2E,#52B788)">🏗️</div>

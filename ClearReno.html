@@ -3,7 +3,54 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ClearRéno — Par EcoTech Solutions</title>
+<title>ClearRéno | Rénovation énergétique prouvée, suivie & récompensée</title>
+<meta name="description" content="ClearRéno par EcoTech Solutions : simulez vos économies d'énergie, suivez votre chantier en temps réel et mesurez votre impact carbone. Pompe à chaleur, isolation, VMC — certifié RGE & ADEME.">
+<meta name="keywords" content="rénovation énergétique, pompe à chaleur, isolation thermique, MaPrimeRénov, simulateur économies énergie, RGE, ADEME, bilan carbone, ITE, VMC, EcoTech Solutions, ClearRéno">
+<meta name="author" content="EcoTech Solutions">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#1A3C2E">
+<meta name="language" content="fr">
+<meta name="geo.region" content="FR-GES">
+<meta name="geo.placename" content="Reims">
+<link rel="canonical" href="https://www.clearreno.fr/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ClearRéno">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:url" content="https://www.clearreno.fr/">
+<meta property="og:title" content="ClearRéno | Rénovation énergétique prouvée, suivie & récompensée">
+<meta property="og:description" content="Simulez vos économies d'énergie, suivez votre chantier en temps réel et mesurez votre impact carbone. Certifié RGE & ADEME.">
+<meta property="og:image" content="https://www.clearreno.fr/og-image.jpg">
+<meta property="og:image:alt" content="ClearRéno — Plateforme de rénovation énergétique par EcoTech Solutions">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ClearRéno | Rénovation énergétique prouvée, suivie & récompensée">
+<meta name="twitter:description" content="Simulez vos économies d'énergie, suivez votre chantier et mesurez votre impact carbone. Certifié RGE & ADEME.">
+<meta name="twitter:image" content="https://www.clearreno.fr/og-image.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%231A3C2E'/%3E%3Ctext x='50' y='68' font-size='58' text-anchor='middle' fill='%2352B788' font-family='Georgia,serif' font-weight='bold'%3EC%3C/text%3E%3C/svg%3E">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "EcoTech Solutions",
+  "alternateName": "ClearRéno",
+  "url": "https://www.clearreno.fr/",
+  "description": "Plateforme de rénovation énergétique : simulation des économies, suivi de chantier en temps réel et mesure de l'impact carbone.",
+  "areaServed": "FR",
+  "address": {"@type": "PostalAddress", "addressLocality": "Reims", "addressRegion": "Grand Est", "addressCountry": "FR"},
+  "knowsAbout": ["Pompe à chaleur", "Isolation thermique", "MaPrimeRénov", "Rénovation énergétique", "Bilan carbone"],
+  "hasCredential": ["RGE", "ADEME", "Qualibat"]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "ClearRéno",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Web",
+  "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"},
+  "aggregateRating": {"@type": "AggregateRating", "ratingValue": "4.9", "reviewCount": "6240"}
+}
+</script>
 <link rel="preconnect" href="https://api.fontshare.com">
 <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=satoshi@400,700&f[]=jet-brains-mono@400&display=swap" rel="stylesheet">
 <style>
@@ -622,7 +669,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); line-height: 1.2; }
   background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
   padding: 64px 0; text-align: center; color: #fff;
 }
-.carbon-hero h1 { font-family: var(--font-display); font-weight: 700; font-size: 36px; margin-bottom: 8px; }
+.carbon-hero h1, .carbon-hero h2 { font-family: var(--font-display); font-weight: 700; font-size: 36px; margin-bottom: 8px; }
 .carbon-hero p { font-size: 16px; color: rgba(255,255,255,0.7); }
 .equivalences { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; margin-top: 24px; }
 .equivalence-item {
@@ -842,12 +889,13 @@ footer {
     <div class="nav-cta">
       <button class="btn btn-primary btn-sm" onclick="navigate('simulateur')">Simulation gratuite</button>
     </div>
-    <div class="hamburger" onclick="toggleMenu()">
+    <div class="hamburger" onclick="toggleMenu()" role="button" aria-label="Ouvrir le menu de navigation" tabindex="0">
       <span></span><span></span><span></span>
     </div>
   </div>
 </nav>
 
+<main id="contenu-principal">
 <!-- ===== VUE 1: LANDING ===== -->
 <section id="view-landing" class="view active">
   <!-- Hero -->
@@ -978,7 +1026,7 @@ footer {
   <div class="hero" style="padding:56px 0">
     <div class="container" style="position:relative;z-index:1">
       <div class="hero-badge">📋 847 projets documentés</div>
-      <h1 class="hero-title" style="font-size:clamp(32px,4vw,52px)">Des résultats réels.<br><span>Vérifiés. Partagés.</span></h1>
+      <h2 class="hero-title" style="font-size:clamp(32px,4vw,52px)">Des résultats réels.<br><span>Vérifiés. Partagés.</span></h2>
       <div class="hero-stats" style="margin-top:40px">
         <div class="hero-stat">
           <span class="hero-stat-val" data-count="847">0</span>
@@ -1279,7 +1327,7 @@ footer {
   <div class="dashboard-header">
     <div class="container">
       <div class="flex-center gap-16 mb-8" style="flex-wrap:wrap">
-        <h1 class="dashboard-greeting">Bonjour Thomas 👋, votre chantier avance bien !</h1>
+        <h2 class="dashboard-greeting">Bonjour Thomas 👋, votre chantier avance bien !</h2>
         <span class="badge badge-pending badge-lg">🟡 Chantier en cours — Étape 4/7</span>
       </div>
       <p style="color:rgba(255,255,255,0.65);font-size:15px">Tableau de bord personnel — Thomas Renard — Reims (51)</p>
@@ -1406,7 +1454,7 @@ footer {
   <div class="carbon-hero">
     <div class="container">
       <div class="hero-badge" style="margin:0 auto 24px">🌿 Votre bilan carbone personnel</div>
-      <h1>Votre impact écologique, Thomas</h1>
+      <h2>Votre impact écologique, Thomas</h2>
       <p>Depuis vos travaux du 2 mai 2026</p>
       <div class="gauge-wrap mt-32" style="margin:32px auto 0;max-width:220px">
         <svg width="220" height="220" viewBox="0 0 220 220">
@@ -1598,7 +1646,7 @@ footer {
   <div class="modal">
     <div class="modal-header">
       <span class="modal-title">📸 Photos — Installation unité extérieure</span>
-      <button class="modal-close" onclick="closeModal()">✕</button>
+      <button class="modal-close" onclick="closeModal()" aria-label="Fermer la fenêtre">✕</button>
     </div>
     <div class="modal-body">
       <div class="photo-grid">
@@ -1610,6 +1658,8 @@ footer {
     </div>
   </div>
 </div>
+
+</main>
 
 <!-- Footer HTML -->
 <template id="footerTpl">

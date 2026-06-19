@@ -3,7 +3,38 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ClearRéno — Hub de Preuves Sociales</title>
+<title>Réalisations & avis clients | ClearRéno rénovation énergétique</title>
+<meta name="description" content="847 chantiers de rénovation énergétique documentés et vérifiés ADEME. Recherchez par IA un chantier similaire au vôtre : pompe à chaleur, isolation, VMC. Économies réelles, avis clients certifiés.">
+<meta name="keywords" content="réalisations rénovation énergétique, avis clients, chantiers pompe à chaleur, économies énergie réelles, preuves ADEME, isolation, VMC, RGE, ClearRéno">
+<meta name="author" content="EcoTech Solutions">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#1A3C2E">
+<meta name="language" content="fr">
+<link rel="canonical" href="https://www.clearreno.fr/realisations">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ClearRéno">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:url" content="https://www.clearreno.fr/realisations">
+<meta property="og:title" content="Réalisations & avis clients | ClearRéno">
+<meta property="og:description" content="847 chantiers documentés et vérifiés ADEME. Trouvez un chantier similaire au vôtre grâce à la recherche IA.">
+<meta property="og:image" content="https://www.clearreno.fr/og-realisations.jpg">
+<meta property="og:image:alt" content="Réalisations de rénovation énergétique ClearRéno">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Réalisations & avis clients | ClearRéno">
+<meta name="twitter:description" content="847 chantiers vérifiés ADEME. Recherche IA d'un chantier similaire au vôtre.">
+<meta name="twitter:image" content="https://www.clearreno.fr/og-realisations.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%231A3C2E'/%3E%3Ctext x='50' y='68' font-size='58' text-anchor='middle' fill='%2352B788' font-family='Georgia,serif' font-weight='bold'%3EC%3C/text%3E%3C/svg%3E">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "Réalisations ClearRéno",
+  "url": "https://www.clearreno.fr/realisations",
+  "inLanguage": "fr-FR",
+  "about": "Chantiers de rénovation énergétique documentés et vérifiés ADEME",
+  "isPartOf": {"@type": "WebSite", "name": "ClearRéno", "url": "https://www.clearreno.fr/"}
+}
+</script>
 <link href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&f[]=satoshi@400,600,700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
 <style>
@@ -273,6 +304,7 @@ footer{background:var(--dark);color:rgba(255,255,255,.75);padding:64px 0 32px}
   </div>
 </nav>
 
+<main id="contenu-principal">
 <!-- HERO -->
 <div class="hero" style="padding-top:120px">
   <div class="container" style="position:relative;z-index:1">
@@ -430,6 +462,8 @@ footer{background:var(--dark);color:rgba(255,255,255,.75);padding:64px 0 32px}
   </div>
 </div>
 
+</main>
+
 <!-- FOOTER -->
 <footer>
   <div class="container">
@@ -457,7 +491,7 @@ footer{background:var(--dark);color:rgba(255,255,255,.75);padding:64px 0 32px}
   <div class="drawer-header" style="position:relative">
     <div class="drawer-title" id="drawerTitle">Assistant ClearRéno</div>
     <div class="drawer-sub" id="drawerSub">Je connais tous les détails de ce chantier.</div>
-    <button class="drawer-close" onclick="toggleChatbot()">✕</button>
+    <button class="drawer-close" onclick="toggleChatbot()" aria-label="Fermer l'assistant">✕</button>
   </div>
   <div class="suggested-qs" id="suggestedQs"></div>
   <div class="chat-messages" id="chatMessages"></div>
@@ -649,7 +683,7 @@ function openDetail(id){
 
   const totalAides=c.aides.maprimerenov+c.aides.cee+c.aides.locale;
   document.getElementById('modalContent').innerHTML=`
-    <div style="padding:8px 8px 0;text-align:right"><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div style="padding:8px 8px 0;text-align:right"><button class="modal-close" onclick="closeModal()" aria-label="Fermer la fenêtre">✕</button></div>
     <div class="modal-hero" style="background:${c.gradient};margin:0 0 0">
       <div style="text-align:center;z-index:1;position:relative">
         <div style="font-size:56px;margin-bottom:12px">${c.type==='pac_aireau'?'♨️':c.type==='pac_airair'?'💨':c.type==='isolation'?'🧱':c.type==='vmc'?'🌀':'⭐'}</div>
