@@ -103,8 +103,12 @@ nav{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(255,255,255
 .upload-zone-icon{font-size:28px}
 .upload-zone-label{font-size:13px;font-weight:700;color:var(--primary)}
 .upload-zone-sub{font-size:11px;color:var(--muted)}
-.upload-check{position:absolute;top:8px;right:8px;background:var(--accent);color:#fff;border-radius:100px;padding:2px 8px;font-size:11px;font-weight:700;display:none}
+.upload-check{position:absolute;top:8px;right:8px;background:var(--accent);color:#fff;border-radius:100px;padding:2px 8px;font-size:11px;font-weight:700;display:none;z-index:2;box-shadow:0 1px 4px rgba(0,0,0,.3)}
 .upload-zone.loaded .upload-check{display:block}
+.upload-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;z-index:0}
+.upload-zone.loaded .upload-photo{display:block}
+.upload-zone.loaded .upload-zone-icon,.upload-zone.loaded .upload-zone-label,.upload-zone.loaded .upload-zone-sub{display:none}
+.upload-zone input{z-index:3}
 .validation-list{list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:24px}
 .val-item{display:flex;align-items:center;gap:8px;font-size:13px}
 .val-ok{color:var(--secondary)}
@@ -312,10 +316,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(255,255,255
         <div class="upload-instruction" style="background:linear-gradient(135deg,#52B788,#B7E4C7);color:#333">🧭 Façade Ouest<br><span style="font-weight:400;font-size:12px">Côté gauche</span></div>
       </div>
       <div class="upload-zones">
-        <div class="upload-zone" id="zone0" onclick="triggerUpload(0)"><input type="file" accept="image/*" onchange="handleUpload(this,0)"><div class="upload-check">✓ Photo chargée</div><span class="upload-zone-icon">📷</span><span class="upload-zone-label">Façade Nord</span><span class="upload-zone-sub">Déposer ou cliquer</span></div>
-        <div class="upload-zone" id="zone1" onclick="triggerUpload(1)"><input type="file" accept="image/*" onchange="handleUpload(this,1)"><div class="upload-check">✓ Photo chargée</div><span class="upload-zone-icon">📷</span><span class="upload-zone-label">Façade Sud</span><span class="upload-zone-sub">Déposer ou cliquer</span></div>
-        <div class="upload-zone" id="zone2" onclick="triggerUpload(2)"><input type="file" accept="image/*" onchange="handleUpload(this,2)"><div class="upload-check">✓ Photo chargée</div><span class="upload-zone-icon">📷</span><span class="upload-zone-label">Façade Est</span><span class="upload-zone-sub">Déposer ou cliquer</span></div>
-        <div class="upload-zone" id="zone3" onclick="triggerUpload(3)"><input type="file" accept="image/*" onchange="handleUpload(this,3)"><div class="upload-check">✓ Photo chargée</div><span class="upload-zone-icon">📷</span><span class="upload-zone-label">Façade Ouest</span><span class="upload-zone-sub">Déposer ou cliquer</span></div>
+        <div class="upload-zone" id="zone0" onclick="triggerUpload(0)"><input type="file" accept="image/*" onchange="handleUpload(this,0)"><img class="upload-photo" id="zoneImg0" alt="Façade Nord"><div class="upload-check">✓ Photo chargée</div><span class="upload-zone-icon">📷</span><span class="upload-zone-label">Façade Nord</span><span class="upload-zone-sub">Déposer ou cliquer</span></div>
+        <div class="upload-zone" id="zone1" onclick="triggerUpload(1)"><input type="file" accept="image/*" onchange="handleUpload(this,1)"><img class="upload-photo" id="zoneImg1" alt="Façade Sud"><div class="upload-check">✓ Photo chargée</div><span class="upload-zone-icon">📷</span><span class="upload-zone-label">Façade Sud</span><span class="upload-zone-sub">Déposer ou cliquer</span></div>
+        <div class="upload-zone" id="zone2" onclick="triggerUpload(2)"><input type="file" accept="image/*" onchange="handleUpload(this,2)"><img class="upload-photo" id="zoneImg2" alt="Façade Est"><div class="upload-check">✓ Photo chargée</div><span class="upload-zone-icon">📷</span><span class="upload-zone-label">Façade Est</span><span class="upload-zone-sub">Déposer ou cliquer</span></div>
+        <div class="upload-zone" id="zone3" onclick="triggerUpload(3)"><input type="file" accept="image/*" onchange="handleUpload(this,3)"><img class="upload-photo" id="zoneImg3" alt="Façade Ouest"><div class="upload-check">✓ Photo chargée</div><span class="upload-zone-icon">📷</span><span class="upload-zone-label">Façade Ouest</span><span class="upload-zone-sub">Déposer ou cliquer</span></div>
       </div>
       <div id="validationList" style="display:none;margin-bottom:24px">
         <ul class="validation-list">
@@ -657,6 +661,10 @@ function triggerUpload(i){document.querySelectorAll('.upload-zone input')[i].cli
 function handleUpload(inp,i){
   if(!inp.files[0])return;
   const zone=document.getElementById('zone'+i);
+  const img=document.getElementById('zoneImg'+i);
+  const reader=new FileReader();
+  reader.onload=e=>{if(img)img.src=e.target.result;};
+  reader.readAsDataURL(inp.files[0]);
   zone.classList.add('loaded');
   zone.querySelector('.upload-zone-icon').textContent='✅';
   showValidation(i);
@@ -670,9 +678,12 @@ function showValidation(i){
 }
 
 function useDemo(){
+  const demos=['uploads/demo/facade-nord.jpg','uploads/demo/facade-sud.jpg','uploads/demo/facade-est.jpg','uploads/demo/facade-ouest.jpg'];
   document.querySelectorAll('.upload-zone').forEach((z,i)=>{
     z.classList.add('loaded');
     z.querySelector('.upload-zone-icon').textContent='✅';
+    const img=document.getElementById('zoneImg'+i);
+    if(img)img.src=demos[i];
   });
   document.getElementById('validationList').style.display='block';
   document.getElementById('nextBtn1').disabled=false;
