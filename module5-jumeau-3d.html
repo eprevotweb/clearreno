@@ -426,41 +426,20 @@ nav{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(255,255,255
               </div>
             </div>
             <div style="position:relative">
-              <div class="house-canvas" id="previewCanvas">
-                <!-- BEFORE house -->
-                <div id="houseSceneBefore" class="house-scene" style="transform:translateX(-50%) translateY(0)">
-                  <div class="house-body">
-                    <div class="house-facade" id="facadeBefore" style="background:#D4C5A9">
-                      <div class="ite-layer" id="iteLayer"></div>
-                      <div class="thermal-zones show" id="thermalZones">
-                        <div class="thermal-zone" style="top:10px;left:10px;right:10px;height:30px;background:rgba(230,57,70,.35);border-radius:4px">🌡️ −28%</div>
-                        <div class="thermal-zone" style="top:50px;left:20px;width:40px;height:40px;background:rgba(230,57,70,.5);border-radius:3px"></div>
-                        <div class="thermal-zone" style="top:50px;right:20px;width:40px;height:40px;background:rgba(230,57,70,.5);border-radius:3px"></div>
-                        <div class="thermal-zone" style="bottom:0;left:0;right:0;height:24px;background:rgba(251,186,0,.3)">−12%</div>
-                      </div>
-                      <div class="veg-plants" id="vegPlants">🌱🌿</div>
-                      <div class="house-windows">
-                        <div class="house-window" id="win1" style="background:#B0C4D8"></div>
-                        <div class="house-window" id="win2" style="background:#B0C4D8"></div>
-                      </div>
-                      <div class="house-door"></div>
-                      <div class="veg-pergola" id="vegPergola"></div>
-                    </div>
-                    <div class="house-roof-cover" id="roofCover"></div>
-                    <div style="position:relative;height:80px">
-                      <div class="house-roof" id="houseRoof"></div>
-                    </div>
-                  </div>
-                  <div class="house-shadow"></div>
-                </div>
+              <div class="house-canvas" id="previewCanvas" style="background:#101418">
+                <img id="previewPhoto" src="uploads/demo/facade-nord.jpg" alt="Façade" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+                <div id="previewTint" style="position:absolute;inset:0;background:#F5F0E8;mix-blend-mode:soft-light;opacity:0;transition:opacity .45s ease,background .45s ease"></div>
+                <div id="previewThermal" style="position:absolute;inset:0;opacity:0;transition:opacity .45s ease;mix-blend-mode:hard-light;background:linear-gradient(180deg,rgba(230,57,70,.7) 0%,rgba(251,140,0,.55) 38%,rgba(251,186,0,.4) 62%,rgba(82,183,136,.45) 100%)"></div>
+                <div id="previewThermalLabel" style="position:absolute;top:10px;left:10px;background:rgba(0,0,0,.65);color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;opacity:0;transition:opacity .3s;backdrop-filter:blur(3px)">🌡️ −28% pertes murs</div>
               </div>
               <!-- BA SLIDER overlay -->
               <div class="ba-container" id="baContainer" style="display:none">
-                <div class="ba-before" id="baBefore" style="background:linear-gradient(180deg,#87CEEB,#B0D4E8 60%,#7CB87C 60%,#5A9E5A 100%)">
-                  <span class="ba-label" style="left:10px;background:rgba(0,0,0,.6);color:#fff">Avant</span>
+                <div class="ba-before" id="baBefore" style="background-image:url('uploads/demo/facade-nord.jpg');background-size:cover;background-position:center">
+                  <span class="ba-label" style="left:10px;background:rgba(0,0,0,.6);color:#fff;z-index:2">Avant</span>
                 </div>
-                <div class="ba-after" id="baAfter" style="background:linear-gradient(180deg,#B0D4FF,#C8DCFF 60%,#90C890 60%,#70A870 100%)">
-                  <span class="ba-label" style="right:10px;background:var(--accent);color:#fff">Après</span>
+                <div class="ba-after" id="baAfter" style="background-image:url('uploads/demo/facade-nord.jpg');background-size:cover;background-position:center">
+                  <div id="baAfterTint" style="position:absolute;inset:0;background:#F5F0E8;mix-blend-mode:soft-light;opacity:.55"></div>
+                  <span class="ba-label" style="right:10px;background:var(--accent);color:#fff;z-index:2">Après</span>
                 </div>
                 <div class="ba-handle" id="baHandle"></div>
               </div>
@@ -651,6 +630,12 @@ function goPanel(n){
     else if(sn<n)s.classList.add('done');
   });
   window.scrollTo({top:72,behavior:'smooth'});
+  if(n===2){
+    syncPreviewPhoto();updateHouseColor();
+    const t=document.getElementById('previewThermal'),tl=document.getElementById('previewThermalLabel');
+    if(t)t.style.opacity=params.thermal?'1':'0';
+    if(tl)tl.style.opacity=params.thermal?'1':'0';
+  }
   if(n===3){loadAIAnalysis();generateQR();document.getElementById('ctaSection').style.display='block';
     if(window.twin){window.twin.init();setTimeout(()=>{window.twin.resize();const c=params.afterColor||params.beforeColor;window.twin.setWallColor(c);},80);}
   }
@@ -720,8 +705,7 @@ function selectWindows(el,val){
   el.classList.add('selected');
   params.windows=val;
   const wColor=val==='anthracite'?'#37474F':'#B0C4D8';
-  ['win1','win2'].forEach(id=>document.getElementById(id).style.background=wColor);
-  ['h3dWin1','h3dWin2','h3dWin3'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.background=wColor;});
+  ['win1','win2','h3dWin1','h3dWin2','h3dWin3'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.background=wColor;});
   document.documentElement.style.setProperty('--window-color',wColor);
   if(window.twin)window.twin.setWindowColor(wColor);
 }
@@ -730,22 +714,30 @@ function toggle(el,key){
   el.classList.toggle('on');
   params[key]=el.classList.contains('on');
   if(key==='thermal'){
-    document.getElementById('thermalZones').classList.toggle('show',params.thermal);
-    document.getElementById('facadeBefore').classList.toggle('thermal-on',params.thermal);
+    const t=document.getElementById('previewThermal');const tl=document.getElementById('previewThermalLabel');
+    if(t)t.style.opacity=params.thermal?'1':'0';
+    if(tl)tl.style.opacity=params.thermal?'1':'0';
   }
-  if(key==='plants'){document.getElementById('vegPlants').classList.toggle('show',params.plants);}
-  if(key==='pergola'){document.getElementById('vegPergola').classList.toggle('show',params.pergola);}
+  if(key==='plants'){const el=document.getElementById('vegPlants');if(el)el.classList.toggle('show',params.plants);}
+  if(key==='pergola'){const el=document.getElementById('vegPergola');if(el)el.classList.toggle('show',params.pergola);}
 }
 
 function updateHouseColor(){
   const color=params.afterColor||params.beforeColor;
-  document.getElementById('facadeBefore').style.background=color;
+  const tint=document.getElementById('previewTint');
+  if(tint)tint.style.background=color;
+  const baTint=document.getElementById('baAfterTint');
+  if(baTint)baTint.style.background=color;
   document.documentElement.style.setProperty('--wall-color',color);
-  const h3d=document.getElementById('h3dFront');
-  const side=document.getElementById('h3dSide');
-  if(h3d)h3d.style.background=color;
-  if(side)side.style.background=shadeColor(color,-20);
   if(window.twin)window.twin.setWallColor(color);
+}
+
+function syncPreviewPhoto(){
+  const up=document.getElementById('zoneImg0');
+  const src=(up&&up.getAttribute('src'))||'uploads/demo/facade-nord.jpg';
+  const ph=document.getElementById('previewPhoto');
+  if(ph)ph.src=src;
+  ['baBefore','baAfter'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.backgroundImage=`url('${src}')`;});
 }
 
 function shadeColor(c,pct){
@@ -759,10 +751,10 @@ function setView(v){
   document.querySelector(`[onclick="setView('${v}')"]`).classList.add('active');
   const canvas=document.getElementById('previewCanvas');
   const ba=document.getElementById('baContainer');
-  if(v==='compare'){canvas.style.display='none';ba.style.display='block';initBASlider();}
-  else{canvas.style.display='block';ba.style.display='none';}
-  if(v==='before'){document.getElementById('facadeBefore').style.background=params.beforeColor||'#D4C5A9';}
-  if(v==='after'){document.getElementById('facadeBefore').style.background=params.afterColor||'#F5F0E8';}
+  const tint=document.getElementById('previewTint');
+  if(v==='compare'){canvas.style.display='none';ba.style.display='block';initBASlider();return;}
+  canvas.style.display='block';ba.style.display='none';
+  if(tint)tint.style.opacity=(v==='after')?'0.6':'0';
 }
 
 function resetParams(){params={material:'pierre',beforeColor:'#D4C5A9',afterColor:'#F5F0E8',afterColorName:'Blanc cassé',windows:'white',pergola:false,plants:false,thermal:true};location.reload();}
@@ -779,6 +771,8 @@ function initBASlider(){
     handle.style.left=pct+'%';
     after.style.clipPath=`inset(0 ${100-pct}% 0 0)`;
   }
+  handle.style.left='50%';
+  after.style.clipPath='inset(0 50% 0 0)';
   handle.onmousedown=()=>dragging=true;
   container.onmousemove=e=>{if(dragging)setPos(e.clientX);};
   document.onmouseup=()=>dragging=false;
