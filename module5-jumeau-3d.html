@@ -509,27 +509,15 @@ nav{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(255,255,255
             <button class="rot-btn" onclick="autoRotate()" id="autoRotBtn" title="Rotation auto">▷</button>
           </div>
         </div>
-        <div class="viewer-main" id="viewerMain" onmousedown="startDrag(event)" onmousemove="onDrag(event)" onmouseup="endDrag()">
-          <!-- Terrain -->
-          <div class="terrain-3d"></div>
-          <!-- 3D House -->
-          <div class="house-3d-scene" id="house3D" style="left:50%;bottom:80px;transform:translateX(-50%) rotateY(-15deg)">
-            <div style="position:relative;width:220px;height:250px;transform-style:preserve-3d">
-              <div class="house-front" id="h3dFront">
-                <div class="win-3d" style="top:30px;left:20px;width:44px;height:44px" id="h3dWin1"></div>
-                <div class="win-3d" style="top:30px;left:80px;width:44px;height:44px" id="h3dWin2"></div>
-                <div class="win-3d" style="top:30px;left:140px;width:44px;height:44px" id="h3dWin3"></div>
-                <div class="door-3d" id="h3dDoor"></div>
-              </div>
-              <div class="house-side" id="h3dSide"></div>
-              <div class="house-roof-3d" id="h3dRoof"></div>
-              <div class="house-roof-side" id="h3dRoofSide"></div>
-            </div>
-          </div>
+        <div class="viewer-main" id="viewerMain">
+          <!-- Three.js canvas mount -->
+          <div id="twin3d" style="position:absolute;inset:0"></div>
+          <div id="twinLoading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--font-m);font-size:13px;opacity:.6;pointer-events:none">Chargement de la vue 3D…</div>
+          <div id="twinCompareLabel" style="display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.65);color:#fff;padding:8px 22px;border-radius:100px;font-family:var(--font-d);font-weight:700;font-size:18px;letter-spacing:.04em;backdrop-filter:blur(4px);pointer-events:none">APRÈS</div>
           <!-- Metric overlays -->
-          <div class="metric-overlay" style="top:16px;left:16px" id="metricTL">+32% gain thermique</div>
-          <div class="metric-overlay" style="top:16px;right:16px" id="metricTR">DPE D → B</div>
-          <div class="metric-overlay" style="bottom:16px;left:16px" id="metricBL">−18% pertes murs</div>
+          <div class="metric-overlay" style="top:16px;left:16px;pointer-events:none" id="metricTL">+32% gain thermique</div>
+          <div class="metric-overlay" style="top:16px;right:16px;pointer-events:none" id="metricTR">DPE D → B</div>
+          <div class="metric-overlay" style="bottom:16px;left:16px;pointer-events:none" id="metricBL">−18% pertes murs</div>
         </div>
       </div>
 
@@ -659,7 +647,9 @@ function goPanel(n){
     else if(sn<n)s.classList.add('done');
   });
   window.scrollTo({top:72,behavior:'smooth'});
-  if(n===3){loadAIAnalysis();generateQR();document.getElementById('ctaSection').style.display='block';}
+  if(n===3){loadAIAnalysis();generateQR();document.getElementById('ctaSection').style.display='block';
+    if(window.twin){window.twin.init();setTimeout(()=>{window.twin.resize();const c=params.afterColor||params.beforeColor;window.twin.setWallColor(c);},80);}
+  }
 }
 
 // UPLOAD
@@ -722,6 +712,7 @@ function selectWindows(el,val){
   ['win1','win2'].forEach(id=>document.getElementById(id).style.background=wColor);
   ['h3dWin1','h3dWin2','h3dWin3'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.background=wColor;});
   document.documentElement.style.setProperty('--window-color',wColor);
+  if(window.twin)window.twin.setWindowColor(wColor);
 }
 
 function toggle(el,key){
@@ -743,6 +734,7 @@ function updateHouseColor(){
   const side=document.getElementById('h3dSide');
   if(h3d)h3d.style.background=color;
   if(side)side.style.background=shadeColor(color,-20);
+  if(window.twin)window.twin.setWallColor(color);
 }
 
 function shadeColor(c,pct){
@@ -817,42 +809,25 @@ function generateParticles(){
   }
 }
 
-// 3D ROTATION
-function rotateHouse(dy,dx){
-  rotY+=dy;rotX+=dx;
-  applyRotation();
-}
-
-function applyRotation(){
-  const h=document.getElementById('house3D');
-  if(h)h.style.transform=`translateX(-50%) rotateY(${rotY}deg) rotateX(${rotX}deg)`;
-}
-
-function resetRotation(){rotX=0;rotY=-15;applyRotation();}
-
+// 3D ROTATION (delegated to Three.js engine)
+function rotateHouse(dy,dx){if(window.twin)window.twin.rotate(dy,dx);}
+function applyRotation(){}
+function resetRotation(){if(window.twin)window.twin.reset();}
 function autoRotate(){
-  if(isAutoRotating){clearInterval(autoRotInterval);isAutoRotating=false;document.getElementById('autoRotBtn').textContent='▷';}
-  else{isAutoRotating=true;document.getElementById('autoRotBtn').textContent='⏸';autoRotInterval=setInterval(()=>{rotY+=1;applyRotation();},30);}
+  if(!window.twin)return;
+  const on=window.twin.toggleAuto();
+  document.getElementById('autoRotBtn').textContent=on?'⏸':'▷';
 }
-
-function startDrag(e){isDragging=true;lastX=e.clientX;}
-function onDrag(e){if(isDragging){rotY+=(e.clientX-lastX)*0.4;lastX=e.clientX;applyRotation();}}
-function endDrag(){isDragging=false;}
+function startDrag(){}function onDrag(){}function endDrag(){}
 
 // VIEWER MODES
 function setMode(btn,mode){
   document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   const metrics=['metricTL','metricTR','metricBL'];
-  if(mode==='thermal'){
-    metrics.forEach(m=>{const el=document.getElementById(m);if(el)el.style.display='flex';});
-    document.getElementById('h3dFront').style.background='rgba(230,57,70,.3)';
-    document.getElementById('h3dSide').style.background='rgba(251,186,0,.3)';
-  } else {
-    updateHouseColor();
-    if(mode==='view3d')metrics.forEach(m=>{const el=document.getElementById(m);if(el)el.style.display='block';});
-    else metrics.forEach(m=>{const el=document.getElementById(m);if(el)el.style.display='none';});
-  }
+  const show=mode!=='compare';
+  metrics.forEach(m=>{const el=document.getElementById(m);if(el)el.style.display=show?'block':'none';});
+  if(window.twin)window.twin.setMode(mode,{before:params.beforeColor||'#D4C5A9',after:params.afterColor||'#F5F0E8'});
 }
 
 // QR CODE (CSS art)
@@ -889,6 +864,251 @@ function openDevisModal(){document.getElementById('devisModal').classList.add('o
 document.addEventListener('DOMContentLoaded',()=>{
   generateQR();
 });
+</script>
+
+<!-- THREE.JS PHOTOREALISTIC DIGITAL TWIN -->
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+let renderer, scene, camera, controls, houseGroup, sun, hemi, skyTex;
+let wallMat, roofMat, glassMat, doorMat, baseMat, frameMat;
+let baseWall = '#F5F0E8', baseGlass = '#B0C4D8';
+const roofBase = '#7a4a3a', doorBase = '#5b3a22';
+let mode = 'view3d', initDone = false;
+let compareT = 0;
+const _before = new THREE.Color('#D4C5A9');
+const _after = new THREE.Color('#F5F0E8');
+const mount = () => document.getElementById('twin3d');
+
+function cnv(s){ const c=document.createElement('canvas'); c.width=c.height=s; return c; }
+function wallTexture(){
+  const c=cnv(256), x=c.getContext('2d');
+  x.fillStyle='#ffffff'; x.fillRect(0,0,256,256);
+  for(let i=0;i<7000;i++){ x.fillStyle=`rgba(0,0,0,${Math.random()*0.05})`; x.fillRect(Math.random()*256,Math.random()*256,1.6,1.6); }
+  for(let i=0;i<2000;i++){ x.fillStyle=`rgba(255,255,255,${Math.random()*0.06})`; x.fillRect(Math.random()*256,Math.random()*256,1.6,1.6); }
+  const t=new THREE.CanvasTexture(c); t.wrapS=t.wrapT=THREE.RepeatWrapping; t.repeat.set(2,2); return t;
+}
+function grassTexture(){
+  const c=cnv(256), x=c.getContext('2d');
+  x.fillStyle='#5d9c4a'; x.fillRect(0,0,256,256);
+  for(let i=0;i<11000;i++){ const g=90+Math.random()*70; x.fillStyle=`rgba(${30+Math.random()*30},${g},${30+Math.random()*30},.5)`; x.fillRect(Math.random()*256,Math.random()*256,2,3); }
+  const t=new THREE.CanvasTexture(c); t.wrapS=t.wrapT=THREE.RepeatWrapping; t.repeat.set(16,16); return t;
+}
+function roofTexture(){
+  const c=cnv(128), x=c.getContext('2d');
+  x.fillStyle='#7a4a3a'; x.fillRect(0,0,128,128);
+  for(let r=0;r<8;r++){ for(let cc=0;cc<8;cc++){ const sh=Math.random()*0.18; x.fillStyle=`rgba(0,0,0,${sh})`; x.fillRect(cc*16,r*16,15,15); } }
+  const t=new THREE.CanvasTexture(c); t.wrapS=t.wrapT=THREE.RepeatWrapping; t.repeat.set(6,3); return t;
+}
+function skyTexture(){
+  const c=document.createElement('canvas'); c.width=8; c.height=256; const x=c.getContext('2d');
+  const g=x.createLinearGradient(0,0,0,256);
+  g.addColorStop(0,'#3b7fd4'); g.addColorStop(.55,'#8fc1ec'); g.addColorStop(1,'#e6f2fb');
+  x.fillStyle=g; x.fillRect(0,0,8,256);
+  const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; return t;
+}
+
+function addWindow(px,py,pz,ry){
+  const g=new THREE.Group();
+  const frame=new THREE.Mesh(new THREE.BoxGeometry(.74,.94,.1), frameMat);
+  const glass=new THREE.Mesh(new THREE.BoxGeometry(.58,.78,.06), glassMat);
+  glass.position.z=.04; frame.castShadow=true;
+  const barV=new THREE.Mesh(new THREE.BoxGeometry(.04,.78,.07), frameMat); barV.position.z=.05;
+  const barH=new THREE.Mesh(new THREE.BoxGeometry(.58,.04,.07), frameMat); barH.position.z=.05;
+  g.add(frame,glass,barV,barH);
+  g.position.set(px,py,pz); g.rotation.y=ry;
+  houseGroup.add(g);
+}
+function addTree(x,z,s){
+  const g=new THREE.Group();
+  const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.09*s,.14*s,.9*s,7), new THREE.MeshStandardMaterial({color:0x6b4a2b,roughness:1}));
+  trunk.position.y=.45*s; trunk.castShadow=true;
+  const foliMat=new THREE.MeshStandardMaterial({color:0x3f8f3a,roughness:1,flatShading:true});
+  const f1=new THREE.Mesh(new THREE.IcosahedronGeometry(.6*s,0), foliMat); f1.position.y=1.2*s; f1.castShadow=true;
+  const f2=new THREE.Mesh(new THREE.IcosahedronGeometry(.42*s,0), foliMat); f2.position.set(.3*s,1.55*s,.1*s); f2.castShadow=true;
+  g.add(trunk,f1,f2); g.position.set(x,0,z); scene.add(g);
+}
+function addBush(x,z){
+  const m=new THREE.Mesh(new THREE.IcosahedronGeometry(.35,0), new THREE.MeshStandardMaterial({color:0x4a9e44,roughness:1,flatShading:true}));
+  m.position.set(x,.28,z); m.castShadow=true; m.receiveShadow=true; scene.add(m);
+}
+
+function build(){
+  scene=new THREE.Scene();
+  skyTex=skyTexture();
+  scene.background=skyTex;
+  scene.fog=new THREE.Fog(0xcfe2f2, 26, 60);
+
+  camera=new THREE.PerspectiveCamera(48, 1, 0.1, 200);
+  camera.position.set(7,4.6,8.4);
+
+  hemi=new THREE.HemisphereLight(0xbfd9ff,0x5b4a36,0.55); scene.add(hemi);
+  sun=new THREE.DirectionalLight(0xfff3e0,2.5);
+  sun.position.set(8,12,6); sun.castShadow=true;
+  sun.shadow.mapSize.set(2048,2048);
+  sun.shadow.camera.near=1; sun.shadow.camera.far=50;
+  sun.shadow.camera.left=-14; sun.shadow.camera.right=14; sun.shadow.camera.top=14; sun.shadow.camera.bottom=-14;
+  sun.shadow.bias=-0.0003; sun.shadow.normalBias=0.02;
+  scene.add(sun);
+  scene.add(new THREE.AmbientLight(0xffffff,0.18));
+
+  // Ground
+  const ground=new THREE.Mesh(new THREE.CircleGeometry(40,48), new THREE.MeshStandardMaterial({map:grassTexture(),roughness:1}));
+  ground.rotation.x=-Math.PI/2; ground.receiveShadow=true; scene.add(ground);
+
+  // Materials
+  wallMat=new THREE.MeshStandardMaterial({color:baseWall,map:wallTexture(),roughness:.92,metalness:0});
+  roofMat=new THREE.MeshStandardMaterial({color:roofBase,map:roofTexture(),roughness:.85});
+  glassMat=new THREE.MeshStandardMaterial({color:baseGlass,roughness:.08,metalness:.2,emissive:0x0a1622,emissiveIntensity:.4});
+  doorMat=new THREE.MeshStandardMaterial({color:doorBase,roughness:.6});
+  baseMat=new THREE.MeshStandardMaterial({color:0x9a948c,roughness:.95});
+  frameMat=new THREE.MeshStandardMaterial({color:0xf2f2f0,roughness:.7});
+
+  houseGroup=new THREE.Group(); scene.add(houseGroup);
+
+  // Foundation slab
+  const slab=new THREE.Mesh(new THREE.BoxGeometry(4.5,.3,3.5), baseMat);
+  slab.position.y=.15; slab.castShadow=true; slab.receiveShadow=true; houseGroup.add(slab);
+
+  // Walls
+  const walls=new THREE.Mesh(new THREE.BoxGeometry(4,2.6,3), wallMat);
+  walls.position.y=1.6; walls.castShadow=true; walls.receiveShadow=true; houseGroup.add(walls);
+
+  // Gable roof (extruded triangle)
+  const rs=new THREE.Shape();
+  rs.moveTo(-2.25,0); rs.lineTo(2.25,0); rs.lineTo(0,1.5); rs.lineTo(-2.25,0);
+  const rg=new THREE.ExtrudeGeometry(rs,{depth:3.4,bevelEnabled:false});
+  rg.translate(0,0,-1.7); rg.computeVertexNormals();
+  const roof=new THREE.Mesh(rg, roofMat);
+  roof.position.y=2.9; roof.castShadow=true; roof.receiveShadow=true; houseGroup.add(roof);
+
+  // Chimney
+  const chim=new THREE.Mesh(new THREE.BoxGeometry(.4,1,.4), baseMat);
+  chim.position.set(1.1,3.7,-.4); chim.castShadow=true; houseGroup.add(chim);
+
+  // Front windows (z = +1.5) at y ~2.0
+  addWindow(-1.2,2.0,1.51,0);
+  addWindow(1.2,2.0,1.51,0);
+  addWindow(-1.2,1.0,1.51,0);
+  addWindow(1.2,1.0,1.51,0);
+  // Side windows
+  addWindow(-2.01,1.7,-.6,-Math.PI/2);
+  addWindow(-2.01,1.7,.6,-Math.PI/2);
+  addWindow(2.01,1.7,0,Math.PI/2);
+  // Back window
+  addWindow(0,1.7,-1.51,Math.PI);
+
+  // Door (front center)
+  const door=new THREE.Mesh(new THREE.BoxGeometry(.9,1.5,.12), doorMat);
+  door.position.set(0,1.05,1.52); door.castShadow=true; houseGroup.add(door);
+  const knob=new THREE.Mesh(new THREE.SphereGeometry(.05,12,12), new THREE.MeshStandardMaterial({color:0xd4af37,metalness:.8,roughness:.3}));
+  knob.position.set(.3,1.05,1.6); houseGroup.add(knob);
+  // Step
+  const step=new THREE.Mesh(new THREE.BoxGeometry(1.3,.18,.5), baseMat);
+  step.position.set(0,.24,1.75); step.castShadow=true; step.receiveShadow=true; houseGroup.add(step);
+
+  // Landscaping
+  addTree(-6,-3,1.1); addTree(6.5,-4,1.3); addTree(-7,3,.9);
+  addBush(-3,2.2); addBush(3,2.2); addBush(-2.4,2.4); addBush(2.6,2.5);
+
+  // Path
+  const path=new THREE.Mesh(new THREE.PlaneGeometry(1.2,4), new THREE.MeshStandardMaterial({color:0xb8b0a4,roughness:1}));
+  path.rotation.x=-Math.PI/2; path.position.set(0,.02,3.8); path.receiveShadow=true; scene.add(path);
+}
+
+function dayMaterials(){
+  scene.background=skyTex; scene.fog.color.set(0xcfe2f2);
+  sun.intensity=2.5; hemi.intensity=.55;
+  wallMat.color.set(baseWall); wallMat.emissive.set(0x000000);
+  roofMat.color.set(roofBase); roofMat.emissive.set(0x000000);
+  doorMat.color.set(doorBase); doorMat.emissive.set(0x000000);
+  glassMat.color.set(baseGlass); glassMat.emissive.set(0x0a1622); glassMat.emissiveIntensity=.4;
+}
+function thermalMaterials(){
+  scene.background=new THREE.Color(0x0b1020); scene.fog.color.set(0x0b1020);
+  sun.intensity=.5; hemi.intensity=.25;
+  // heat ramp: roof hottest, walls warm, windows cold loss, door warm
+  roofMat.color.set(0x2a0d0d); roofMat.emissive.set(0xff2d1a); roofMat.emissiveIntensity=1.1;
+  wallMat.color.set(0x2a1505); wallMat.emissive.set(0xff7a1a); wallMat.emissiveIntensity=.85;
+  doorMat.color.set(0x2a1505); doorMat.emissive.set(0xffb300); doorMat.emissiveIntensity=.9;
+  glassMat.color.set(0x06121f); glassMat.emissive.set(0x2d7bff); glassMat.emissiveIntensity=1.0;
+}
+
+function orbit(dThetaDeg,dPhiDeg){
+  const off=camera.position.clone().sub(controls.target);
+  const sph=new THREE.Spherical().setFromVector3(off);
+  sph.theta-=THREE.MathUtils.degToRad(dThetaDeg);
+  sph.phi=THREE.MathUtils.clamp(sph.phi-THREE.MathUtils.degToRad(dPhiDeg),0.18,Math.PI/2-0.04);
+  off.setFromSpherical(sph);
+  camera.position.copy(controls.target).add(off);
+  controls.update();
+}
+
+function animate(){
+  requestAnimationFrame(animate);
+  if(controls)controls.update();
+  if(mode==='compare'&&wallMat){
+    compareT+=0.012;
+    const k=Math.sin(compareT)*0.5+0.5;
+    wallMat.color.copy(_before).lerp(_after,k);
+    const lbl=document.getElementById('twinCompareLabel');
+    if(lbl)lbl.textContent=k>0.5?'APRÈS':'AVANT';
+  }
+  if(renderer)renderer.render(scene,camera);
+}
+
+window.twin={
+  init(){
+    if(initDone)return;
+    const el=mount(); if(!el)return;
+    try{
+      renderer=new THREE.WebGLRenderer({antialias:true});
+      renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+      renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+      renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.05;
+      renderer.outputColorSpace=THREE.SRGBColorSpace;
+      el.appendChild(renderer.domElement);
+      build();
+      controls=new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping=true; controls.dampingFactor=.08;
+      controls.minDistance=5; controls.maxDistance=24;
+      controls.maxPolarAngle=Math.PI*0.49; controls.target.set(0,1.5,0);
+      controls.autoRotateSpeed=1.3; controls.enablePan=false;
+      initDone=true;
+      this.resize();
+      animate();
+      const l=document.getElementById('twinLoading'); if(l)l.style.display='none';
+      window.addEventListener('resize',()=>this.resize());
+    }catch(e){
+      const l=document.getElementById('twinLoading'); if(l)l.textContent='Vue 3D indisponible sur ce navigateur';
+      console.error('twin3d',e);
+    }
+  },
+  resize(){
+    if(!renderer)return; const el=mount(); if(!el)return;
+    const w=el.clientWidth,h=el.clientHeight; if(w<2||h<2)return;
+    renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix();
+  },
+  setWallColor(hex){ baseWall=hex; if(mode==='view3d'&&wallMat)wallMat.color.set(hex); if(mode!=='thermal')_after.set(hex); },
+  setWindowColor(hex){ baseGlass=hex; if(mode!=='thermal'&&glassMat)glassMat.color.set(hex); },
+  setMode(m,opts){
+    if(!initDone)return; mode=m;
+    const lbl=document.getElementById('twinCompareLabel');
+    if(m==='thermal'){ if(lbl)lbl.style.display='none'; thermalMaterials(); }
+    else if(m==='compare'){
+      dayMaterials();
+      _before.set((opts&&opts.before)||'#D4C5A9'); _after.set((opts&&opts.after)||baseWall);
+      if(lbl)lbl.style.display='block';
+    } else { if(lbl)lbl.style.display='none'; dayMaterials(); }
+  },
+  rotate(dy,dx){ if(controls)orbit(dy,dx); },
+  reset(){ if(!controls)return; camera.position.set(7,4.6,8.4); controls.target.set(0,1.5,0); controls.update(); },
+  toggleAuto(){ if(!controls)return false; controls.autoRotate=!controls.autoRotate; return controls.autoRotate; }
+};
 </script>
 </body>
 </html>
